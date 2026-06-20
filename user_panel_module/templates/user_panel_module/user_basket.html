@@ -1,5 +1,10 @@
-{% extends 'shared/_layout.html' %}
+{% extends 'shared/base.html' %}
 {% load poll_extras %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
 
 {% block title %}
     سبد خرید

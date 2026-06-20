@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+{% load static %}
+{% load render_partial %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}آگروپارس | نهاده‌ها و تجهیزات کشاورزی{% endblock %}</title>
+    {% block extra_css %}{% endblock %}
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#059669">
+    <link rel="stylesheet" href="{% static 'css/Vazirmatn-font-face.css' %}">
+    <link rel="stylesheet" href="{% static 'css/core.css' %}">
+
+    <script defer src="{% static 'js/vendors/alpine.min.js' %}"></script>
+    <script src="{% static 'js/vendors/jquery.min.js' %}"></script>
+    <script src="{% static 'js/vendors/sweetalert2.min.js' %}"></script>
+    <script>
+        window.isUserAuthenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
+    </script>
+    <script src="{% static 'js/custom.js' %}"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+{% block header %}
+    {% render_partial 'home_module.views.site_header_component' %}
+{% endblock %}
+
+<main class="min-screen">
+    {% block content %}{% endblock %}
+</main>
+
+{% block footer %}
+    {% render_partial 'home_module.views.site_footer_component' %}
+{% endblock %}
+
+<div id="pwa-install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; width: 90%; max-width: 400px; text-align: center; border: 1px solid #e2e8f0;">
+    <h4 style="margin-bottom: 8px; font-weight: bold; color: #1e293b;">نصب اپلیکیشن آگروپارس</h4>
+    <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">برای دسترسی سریع‌تر، اپلیکیشن فروشگاه ما را نصب کنید.</p>
+    <div style="display: flex; gap: 8px; justify-content: center;">
+        <button id="pwa-install-btn" style="background: #059669; color: #fff; border: none; padding: 8px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: inherit;">نصب</button>
+        <button id="pwa-cancel-btn" style="background: #f1f5f9; color: #64748b; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: inherit;">فعلاً نه</button>
+    </div>
+</div>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').then(registration => {
+                console.log('SW registered: ', registration);
+            }).catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        });
+    }
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('pwa-install-prompt').style.display = 'block';
+    });
+
+    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            document.getElementById('pwa-install-prompt').style.display = 'none';
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to the install prompt: ${outcome}`);
+            deferredPrompt = null;
+        }
+    });
+
+    document.getElementById('pwa-cancel-btn').addEventListener('click', () => {
+        document.getElementById('pwa-install-prompt').style.display = 'none';
+    });
+</script>
+
+</body>
+</html>
+{% block extra_js %}
+{% endblock %}

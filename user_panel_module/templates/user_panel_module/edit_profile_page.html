@@ -1,28 +1,87 @@
-{% extends 'shared/_layout.html' %}
+{% extends 'shared/base.html' %}
 {% load render_partial %}
 
 {% block title %}
-    ویرایش اطلاعات کاربری
+    ویرایش اطلاعات کاربری | آگروپارس
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                {% if current_user.avatar %}
-                    <a class="thumbnail">
-                        <img style="width: 100%" src="{{ current_user.avatar.url }}" alt="">
-                    </a>
-                {% endif %}
-                {% render_partial 'user_panel_module.views.user_panel_menu_component' %}
-            </div>
-            <div class="col-md-8">
+<style>
+    .dashboard-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        margin-top: 40px;
+        margin-bottom: 80px;
+    }
+    .dashboard-sidebar { width: 100%; }
+    .dashboard-main { flex-grow: 1; width: 100%; }
+    @media (min-width: 992px) {
+        .dashboard-layout { flex-direction: row; }
+        .dashboard-sidebar { width: 320px; flex-shrink: 0; }
+    }
+
+    .form-box {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        padding: 32px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    .form-box p {
+        margin-bottom: 20px;
+    }
+    
+    .form-box label {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+    }
+
+    .form-box input[type="text"],
+    .form-box input[type="file"],
+    .form-box input[type="password"] {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        font-size: 15px;
+        transition: all 0.2s;
+        font-family: inherit;
+        background: #f8fafc;
+    }
+
+    .form-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(5,150,105,0.1);
+    }
+</style>
+
+<div class="container">
+    <div class="dashboard-layout">
+        <aside class="dashboard-sidebar">
+            {% render_partial 'user_panel_module.views.user_panel_menu_component' %}
+        </aside>
+        
+        <main class="dashboard-main">
+            <div class="form-box">
+                <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">ویرایش اطلاعات کاربری</h2>
+                
                 <form enctype="multipart/form-data" action="{% url 'edit_profile_page' %}" method="post">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <button type="submit" class="btn btn-success">ثبت</button>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 16px; width: 100%; max-width: 200px;">
+                        ذخیره تغییرات
+                    </button>
                 </form>
             </div>
-        </div>
+        </main>
     </div>
+</div>
 {% endblock %}

@@ -16,7 +16,7 @@ class ArticlesListView(ListView):
 
     def get_queryset(self):
         query = super(ArticlesListView, self).get_queryset()
-        query = query.filter(is_active=True)
+        query = query.filter(is_active=True).select_related('author').prefetch_related('selected_categories')
         category_name = self.kwargs.get('category')
         if category_name is not None:
             query = query.filter(selected_categories__url_title__iexact=category_name)
@@ -29,7 +29,7 @@ class ArticleDetailView(DetailView):
 
     def get_queryset(self):
         query = super(ArticleDetailView, self).get_queryset()
-        query = query.filter(is_active=True)
+        query = query.filter(is_active=True).select_related('author').prefetch_related('selected_categories', 'related_articles', 'related_products')
         return query
 
     def get_context_data(self, **kwargs):

@@ -1,117 +1,248 @@
-<header id="header"><!--header-->
-    <div class="header_top"><!--header_top-->
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="contactinfo">
-                        <ul class="nav nav-pills">
-                            <li><a href="#"><i class="fa fa-phone"></i> 80 21 24 36 98+ </a></li>
-                            <li><a href="#"><i class="fa fa-envelope"></i> info@domain.com</a></li>
-                        </ul>
+{% load static %}
+
+<div x-data="{ mobileMenuOpen: false }">
+
+    <div class="top-announcement-bar"
+         style="background-color: #065f46; color: #ecfdf5; font-size: 13px; padding: 8px 0;">
+        <div class="container"
+             style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; gap: 24px;">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <span style="width: 16px; height: 16px; background-color: #ffffff; -webkit-mask: url('{% static 'images/icons/phone.svg' %}') no-repeat center; mask: url('{% static 'images/icons/phone.svg' %}') no-repeat center; -webkit-mask-size: contain; mask-size: contain; display: inline-block;"></span>
+                    پشتیبانی: 09932248464
+                </span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <img src="{% static 'images/icons/location.svg' %}"
+                         style="width: 16px; height: 16px; filter: brightness(0) invert(1);" alt="Location">
+                    ارسال سریع به سراسر کشور
+                </span>
+            </div>
+            <div style="font-weight: 600;" class="desktop-only">ضمانت اصالت و تاییدیه‌های سازمان حفظ نباتات</div>
+        </div>
+    </div>
+
+    <header style="background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40;">
+        <div class="container header-main-row"
+             style="display: flex; align-items: center; justify-content: space-between; height: 80px; gap: 24px;">
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button @click="mobileMenuOpen = true" class="mobile-only"
+                        style="background: transparent; border: none; cursor: pointer; color: var(--text-dark); padding: 4px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                    <div class="flex-center"
+                         style="width: 44px; height: 44px; background-color: var(--primary); color: white; font-weight: 800; font-size: 20px; border-radius: 8px;">
+                        آگر
                     </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="social-icons pull-right">
-                        <ul class="nav navbar-nav">
-                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                            <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-                            <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-                        </ul>
+                    <div class="desktop-only">
+                        <h1 style="font-size: 18px; font-weight: 800; color: var(--primary); line-height: 1;">
+                            آگروپارس</h1>
+                        <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">تجهیزات و نهاده‌های کشاورزی</span>
                     </div>
-                </div>
+                </a>
+            </div>
+
+            <form action="{% url 'product-list' %}" method="GET" class="desktop-only"
+                 style="flex-grow: 1; max-width: 600px; display: flex; position: relative; align-items: center; margin: 0;">
+                <input type="text" name="q" class="header-search-input" placeholder="جستجوی سموم، کودها، بذرها و نام آفت..." 
+                       style="width: 100%; padding: 12px 16px 12px 40px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-site); font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.2s;">
+                <button type="submit" style="position: absolute; left: 14px; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <img src="{% static 'images/icons/search.svg' %}" alt="جستجو"
+                         style="width: 20px; height: 20px; opacity: 0.5; transition: opacity 0.2s;">
+                </button>
+            </form>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+
+                {% if request.user.is_authenticated %}
+                    {% if request.user.is_superuser %}
+                        <a href="{% url 'admin_panel_dashboard' %}" class="btn-ghost desktop-only" style="gap: 8px; color: #ef4444;">
+                            <i class="fa fa-tachometer fa-lg"></i>
+                            <span style="padding-top: 2px;">پنل مدیریت</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'user_panel_dashboard' %}" class="btn-ghost desktop-only" style="gap: 8px;">
+                            <img src="{% static 'images/icons/user.svg' %}" alt="User"
+                                 style="width: 20px; height: 20px; opacity: 0.7;">
+                            <span style="padding-top: 2px;">پنل کاربری</span>
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'otp_auth:auth_page' %}" class="btn-ghost desktop-only" style="gap: 8px;">
+                        <img src="{% static 'images/icons/user.svg' %}" alt="User"
+                             style="width: 20px; height: 20px; opacity: 0.7;">
+                        <span style="padding-top: 2px;">ورود / ثبت‌نام</span>
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'user_basket_page' %}" class="btn btn-orange"
+                   style="padding: 10px 24px; border-radius: 50px; gap: 8px; position: relative;">
+                    <img src="{% static 'images/icons/cart.svg' %}" alt="Cart"
+                         style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
+                    <span class="desktop-only" style="padding-top: 2px;">سبد خرید</span>
+                    <span id="cart-count-badge" class="badge-danger"
+                          style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; background: var(--color-danger); color: white; border: 2px solid white; display: flex; align-items: center; justify-content: center; line-height: 1;">{{ cart_count|default:"0" }}</span>
+                </a>
             </div>
         </div>
-    </div><!--/header_top-->
 
-    <div class="header-middle"><!--header-middle-->
-        <div class="container">
-            <div class="row">
-                <!-- <div class="col-sm-4 header-middle-menu">
-                    <div class="shop-menu pull-left">
-                        <ul class="nav navbar-nav">
-                            <li><a href="checkout.html"><i class="fa fa-crosshairs"></i> پرداخت</a></li>
-                        </ul>
-                    </div>
-                </div> -->
+        <nav class="bg-primary desktop-only" style="height: 48px;">
+            <div class="container"
+                 style="display: flex; align-items: center; gap: 24px; height: 100%; font-size: 14px; font-weight: 700;">
+                <a href="#"
+                   style="color: white; text-decoration: none; display: flex; align-items: center; gap: 6px;"><img
+                        src="{% static 'images/icons/bug.svg' %}" alt="Bug"
+                        style="width: 20px; height: 20px; filter: brightness(0) invert(1);"> سموم کشاورزی</a>
+                <a href="#"
+                   style="color: white; text-decoration: none; display: flex; align-items: center; gap: 6px;"><img
+                        src="{% static 'images/icons/flask.svg' %}" alt="Flask"
+                        style="width: 20px; height: 20px; filter: brightness(0) invert(1);"> کود و تغذیه گیاهی</a>
+                <a href="#"
+                   style="color: white; text-decoration: none; display: flex; align-items: center; gap: 6px;"><img
+                        src="{% static 'images/icons/shield.svg' %}" alt="Shield"
+                        style="width: 20px; height: 20px; filter: brightness(0) invert(1);"> تجهیزات ایمنی</a>
+                <a href="#"
+                   style="color: white; text-decoration: none; display: flex; align-items: center; gap: 6px;"><img
+                        src="{% static 'images/icons/book.svg' %}" alt="Book"
+                        style="width: 20px; height: 20px; filter: brightness(0) invert(1);"> مجله آموزشی کشاورزی</a>
+            </div>
+        </nav>
+    </header>
 
-                <div class="col-sm-4" style="text-align: left;">
-                    <div class="logo">
-                        <a href="index.html"><img src="{{ site_setting.site_logo.url }}" alt="Logo"
-                                                  style="text-align: center;"/></a>
+    <div x-show="mobileMenuOpen" style="display: none; position: relative; z-index: 1000;">
+        <!-- بک‌گراند تیره (Overlay) -->
+        <div style="position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);"
+             x-show="mobileMenuOpen"
+             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click="mobileMenuOpen = false"></div>
+
+        <!-- منوی کشویی (Drawer) -->
+        <div style="position: fixed; top: 0; right: 0; bottom: 0; width: 320px; max-width: 85vw; background: #ffffff; display: flex; flex-direction: column; overflow-y: auto; box-shadow: -10px 0 25px rgba(0,0,0,0.1);"
+             x-show="mobileMenuOpen"
+             x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full">
+
+            <!-- هدر منو -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border); background: #f8fafc;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="flex-center" style="width: 36px; height: 36px; background-color: var(--primary); color: white; font-weight: 800; font-size: 16px; border-radius: 8px;">
+                        آگر
                     </div>
+                    <span style="font-weight: 900; font-size: 18px; color: var(--text-dark);">آگروپارس</span>
                 </div>
+                <button @click="mobileMenuOpen = false"
+                        style="background: #e2e8f0; border: none; cursor: pointer; color: var(--text-dark); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
 
-                <div class="col-sm-8 header-middle-menu">
-                    <div class="shop-menu pull-right">
-                        <ul class="nav navbar-nav">
-                            {% if request.user.is_authenticated %}
-                                {% if request.user.is_superuser %}
-                                    <li><a href="/admin"><i class="fa fa-user"></i> پنل ادمین</a></li>
-                                {% endif %}
-                                <li><a href="{% url 'user_basket_page' %}"><i class="fa fa-shopping-cart"></i> سبد خرید</a>
-                                </li>
-                                <li><a href="{% url 'user_panel_dashboard' %}"><i class="fa fa-user"></i> پنل کاربری</a>
-                                </li>
-                                <li><a href="{% url 'logout_page' %}"><i class="fa fa-sign-out"></i> خروج</a></li>
+            <div style="padding: 24px;">
+                <!-- کاربر و ورود -->
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'user_panel_dashboard' %}"
+                       style="display: flex; align-items: center; gap: 14px; background: #f1f5f9; padding: 16px; border-radius: var(--radius-lg); color: var(--text-dark); text-decoration: none; font-weight: 700; font-size: 15px; margin-bottom: 24px; border: 1px solid var(--border); transition: all 0.2s;">
+                        <div style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); overflow: hidden;">
+                            {% if request.user.avatar %}
+                                <img src="{{ request.user.avatar.url }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                             {% else %}
-                                <li><a href="{% url 'register_page' %}"><i class="fa fa-user-plus"></i> ثبت نام</a></li>
-                                <li><a href="{% url 'login_page' %}"><i class="fa fa-sign-in"></i> ورود</a></li>
+                                <img src="{% static 'images/icons/user.svg' %}" alt="User" style="width: 20px; height: 20px; filter: brightness(0) invert(0.4);">
                             {% endif %}
-                        </ul>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; color: var(--text-muted); font-weight: 500;">حساب کاربری</div>
+                            <div style="color: var(--primary);">پنل کاربری</div>
+                        </div>
+                    </a>
+                {% else %}
+                    <a href="{% url 'otp_auth:auth_page' %}"
+                       style="display: flex; align-items: center; gap: 14px; background: #f1f5f9; padding: 16px; border-radius: var(--radius-lg); color: var(--text-dark); text-decoration: none; font-weight: 700; font-size: 15px; margin-bottom: 24px; border: 1px solid var(--border); transition: all 0.2s;">
+                        <div style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);">
+                            <img src="{% static 'images/icons/user.svg' %}" alt="User"
+                                 style="width: 20px; height: 20px; filter: brightness(0) invert(0.4);">
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; color: var(--text-muted); font-weight: 500;">حساب کاربری</div>
+                            <div style="color: var(--primary);">ورود / ثبت‌نام</div>
+                        </div>
+                    </a>
+                {% endif %}
+
+                <!-- جستجو -->
+                <form action="{% url 'product-list' %}" method="GET" style="position: relative; display: flex; align-items: center; margin-bottom: 32px;">
+                    <input type="text" name="q" placeholder="جستجوی محصول..."
+                           style="width: 100%; height: 48px; padding: 10px 16px 10px 48px; border: 1px solid var(--border); border-radius: var(--radius-md); background-color: white; color: var(--text-dark); outline: none; font-size: 14px; font-family: inherit;">
+                    <button type="submit" style="position: absolute; left: 14px; background: none; border: none; cursor: pointer; display: flex;">
+                        <img src="{% static 'images/icons/search.svg' %}" alt="جستجو"
+                             style="width: 20px; height: 20px; opacity: 0.5;">
+                    </button>
+                </form>
+
+                <!-- لینک‌های ناوبری -->
+                <nav style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="{% url 'product-list' %}"
+                       style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: var(--radius-md); background: white; color: var(--text-dark); text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid transparent; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; background: #ecfdf5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <img src="{% static 'images/icons/bug.svg' %}" alt="Bug" style="width: 20px; height: 20px; filter: invert(45%) sepia(85%) saturate(452%) hue-rotate(113deg) brightness(92%) contrast(92%);">
+                            </div>
+                            فروشگاه سموم
+                        </div>
+                        <img src="{% static 'images/icons/chevron-left.svg' %}" style="width: 16px; opacity: 0.3;">
+                    </a>
+                    
+                    <a href="{% url 'user_basket_page' %}"
+                       style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: var(--radius-md); background: white; color: var(--text-dark); text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid transparent; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; background: #ecfdf5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <img src="{% static 'images/icons/cart.svg' %}" alt="Cart" style="width: 20px; height: 20px; filter: invert(34%) sepia(87%) saturate(1475%) hue-rotate(114deg) brightness(96%) contrast(92%);">
+                            </div>
+                            سبد خرید <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">{{ cart_count|default:"0" }}</span>
+                        </div>
+                        <img src="{% static 'images/icons/chevron-left.svg' %}" style="width: 16px; opacity: 0.3;">
+                    </a>
+                    
+                    <a href="{% url 'articles_list' %}"
+                       style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: var(--radius-md); background: white; color: var(--text-dark); text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid transparent; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; background: #fef2f2; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <img src="{% static 'images/icons/book.svg' %}" alt="Book" style="width: 20px; height: 20px; filter: invert(34%) sepia(87%) saturate(1475%) hue-rotate(334deg) brightness(95%) contrast(98%);">
+                            </div>
+                            مجله آموزشی
+                        </div>
+                        <img src="{% static 'images/icons/chevron-left.svg' %}" style="width: 16px; opacity: 0.3;">
+                    </a>
+                </nav>
+            </div>
+
+            <!-- بخش پشتیبانی (در پایین منو) -->
+            <div style="margin-top: auto; background: #f8fafc; padding: 24px; border-top: 1px solid var(--border);">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+                        <img src="{% static 'images/icons/phone.svg' %}" alt="Phone" style="width: 24px; height: 24px; filter: brightness(0) invert(1);">
+                    </div>
+                    <div>
+                        <span style="display: block; color: var(--text-muted); font-size: 12px; margin-bottom: 4px;">مشاوره و خرید تلفنی</span>
+                        <a href="tel:09932248464"
+                           style="color: var(--text-dark); font-weight: 900; font-size: 18px; text-decoration: none; direction: ltr; display: inline-block;">0993 224 8464</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div><!--/header-middle-->
-
-    <div class="header-bottom"><!--header-bottom-->
-        <div class="container">
-            <div class="row">
-
-                <div class="col-sm-3">
-                    <div class="search_box pull-left">
-                        <input type="text" placeholder="جستـجو"/>
-                    </div>
-                </div>
-
-                <div class="col-sm-9">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse"
-                                data-target=".navbar-collapse">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                    </div>
-                    <div class="mainmenu pull-right">
-                        <ul class="nav navbar-nav collapse navbar-collapse">
-                            <li>
-                                <a href="{% url 'home_page' %}"
-                                   class="{% if request.resolver_match.url_name == 'home_page' %}active{% endif %}">
-                                    خـانه
-                                </a>
-                            </li>
-                            <li>
-                                <a class="{% if request.resolver_match.url_name == 'product-list' %}active{% endif %}"
-                                   href="{% url 'product-list' %}">محصولات</a>
-                            </li>
-                            <li><a
-                                    class="{% if request.resolver_match.url_name == 'articles_list' %}active{% endif %}"
-                                    href="{% url 'articles_list' %}">مقالات</a></li>
-                            <li><a
-                                    class="{% if request.resolver_match.url_name == 'about_page' %}active{% endif %}"
-                                    href="{% url 'about_page' %}">درباره مـا</a></li>
-                            <li><a
-                                    class="{% if request.resolver_match.url_name == 'contact_us_page' %}active{% endif %}"
-                                    href="{% url 'contact_us_page' %}">تماس با مـا</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div><!--/header-bottom-->
-</header><!--/header-->
+    </div>
+</div>

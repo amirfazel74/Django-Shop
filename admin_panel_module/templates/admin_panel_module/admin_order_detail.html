@@ -1,0 +1,102 @@
+{% extends 'shared/base.html' %}
+{% load render_partial %}
+{% load poll_extras %}
+
+{% block title %}جزئیات سفارش #{{ order.id }} | آگروپارس{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-layout { display: flex; flex-direction: column; gap: 32px; margin-top: 40px; margin-bottom: 80px; }
+    .dashboard-sidebar { width: 100%; }
+    .dashboard-main { flex-grow: 1; width: 100%; }
+    @media (min-width: 992px) { .dashboard-layout { flex-direction: row; } .dashboard-sidebar { width: 320px; flex-shrink: 0; } }
+    .detail-card { background: white; border-radius: var(--radius-lg); padding: 24px; border: 1px solid var(--border); margin-bottom: 24px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--border); }
+    .detail-row:last-child { border-bottom: none; }
+</style>
+
+<div class="container">
+    <div class="dashboard-layout">
+        <aside class="dashboard-sidebar">
+            {% render_partial 'admin_panel_module.views.admin_panel_menu_component' %}
+        </aside>
+        
+        <main class="dashboard-main">
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <!-- ستون راست: اطلاعات سفارش و گیرنده -->
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="detail-card">
+                        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 8px;">اطلاعات سفارش</h3>
+                        <div class="detail-row"><span>وضعیت مالی:</span> <strong>{% if order.is_paid %}<span style="color: #10b981;">پرداخت شده</span>{% else %}<span style="color: #ef4444;">پرداخت نشده</span>{% endif %}</strong></div>
+                        <div class="detail-row"><span>شماره پیگیری زیبال:</span> <strong style="font-family: monospace;">{{ order.payment_ref_number|default:"-" }}</strong></div>
+                        <div class="detail-row"><span>تاریخ پرداخت:</span> <strong>{{ order.payment_date|date:"Y/m/d H:i"|default:"-" }}</strong></div>
+                        <div class="detail-row"><span>هزینه ارسال:</span> <strong>{{ order.shipping_cost|three_digits_currency }} تومان</strong></div>
+                        <div class="detail-row"><span>مبلغ کل کالاها:</span> <strong>{{ sum|three_digits_currency }} تومان</strong></div>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 8px;">اطلاعات گیرنده</h3>
+                        <div class="detail-row"><span>نام و نام خانوادگی:</span> <strong>{{ order.first_name }} {{ order.last_name }}</strong></div>
+                        <div class="detail-row"><span>شماره تماس:</span> <strong>{{ order.mobile }}</strong></div>
+                        <div class="detail-row"><span>استان و شهر:</span> <strong>{{ order.province }} - {{ order.city }}</strong></div>
+                        <div class="detail-row"><span>کد پستی:</span> <strong>{{ order.postal_code|default:"-" }}</strong></div>
+                        <div style="padding: 12px 0; line-height: 1.8;">
+                            <span>آدرس کامل:</span><br>
+                            <strong>{{ order.address }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ستون چپ: تغییر وضعیت و اقلام -->
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="detail-card" style="background: #f8fafc; border: 2px solid #e2e8f0;">
+                        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 20px; color: var(--text-dark);">عملیات مدیریت</h3>
+                        
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">تغییر وضعیت سفارش:</label>
+                                <select name="status" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); outline: none;">
+                                    <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>در انتظار پرداخت</option>
+                                    <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>در حال پردازش (بسته‌بندی)</option>
+                                    <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>ارسال شده (تحویل پست/باربری)</option>
+                                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>تحویل شده به مشتری</option>
+                                    <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>لغو شده</option>
+                                </select>
+                            </div>
+                            
+                            <div style="margin-bottom: 24px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">کد رهگیری مرسوله (اختیاری):</label>
+                                <input type="text" name="tracking_code" value="{{ order.tracking_code|default:'' }}" placeholder="مثلاً کدرهگیری 24 رقمی پست" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); outline: none;">
+                                <small style="color: var(--text-muted); display: block; margin-top: 6px;">با ثبت این کد، کاربر می‌تواند مرسوله خود را پیگیری کند.</small>
+                            </div>
+                            
+                            <button type="submit" style="width: 100%; padding: 14px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: background 0.2s;">
+                                ذخیره تغییرات
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 20px; color: var(--text-dark);">اقلام سفارش</h3>
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            {% for detail in order.orderdetail_set.all %}
+                            <div style="display: flex; gap: 16px; align-items: center; border-bottom: 1px solid var(--bg-site); padding-bottom: 16px;">
+                                <img src="{{ detail.product.image.url }}" alt="{{ detail.product.title }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
+                                <div style="flex: 1;">
+                                    <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;"><a href="{% url 'product-detail' detail.product.slug %}" target="_blank" style="color: var(--text-dark); text-decoration: none;">{{ detail.product.title }}</a></h4>
+                                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                        <span style="color: var(--text-muted);">{{ detail.count }} عدد</span>
+                                        <strong style="color: var(--primary);">{% if order.is_paid %}{{ detail.final_price|three_digits_currency }}{% else %}{{ detail.product.price|three_digits_currency }}{% endif %} تومان</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

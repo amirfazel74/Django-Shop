@@ -1,0 +1,58 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block title %}
+پرداخت موفق
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container" style="margin-top: 40px; margin-bottom: 40px;">
+    <!-- Stepper -->
+    <div class="checkout-stepper">
+        <div class="step active completed">
+            <div class="step-circle"><i class="fa fa-check"></i></div>
+            <div class="step-label">سبد خرید</div>
+        </div>
+        <div class="step-line active"></div>
+        <div class="step active completed">
+            <div class="step-circle"><i class="fa fa-check"></i></div>
+            <div class="step-label">اطلاعات ارسال</div>
+        </div>
+        <div class="step-line active"></div>
+        <div class="step active completed">
+            <div class="step-circle"><i class="fa fa-check"></i></div>
+            <div class="step-label">پرداخت</div>
+        </div>
+    </div>
+
+    <div class="status-page-wrapper">
+        <div class="status-card success">
+            <div class="status-icon">
+                <i class="fa fa-check-circle" style="color: #10b981;"></i>
+            </div>
+            <h2>پرداخت با موفقیت انجام شد!</h2>
+            <p>سفارش شما با موفقیت ثبت شد و در اسرع وقت پردازش خواهد شد.</p>
+            
+            <div class="status-details">
+                <div class="detail-row">
+                    <span>شماره سفارش:</span>
+                    <strong>#AGR-{{ order_id }}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>شماره پیگیری (رفرنس):</span>
+                    <strong>{{ ref_number }}</strong>
+                </div>
+            </div>
+            
+            <div class="status-actions">
+                <a href="{% url 'user_panel_dashboard' %}" class="btn-checkout-primary" style="display: inline-block; width: auto; padding: 12px 32px;">پیگیری سفارش در داشبورد</a>
+                <a href="/" class="btn-return-shop" style="margin-top: 15px;">بازگشت به صفحه اصلی</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,19 +1,148 @@
-{% extends 'shared/_layout.html' %}
+{% extends 'shared/base.html' %}
 {% load render_partial %}
+{% load static %}
 
 {% block title %}
-    داشبورد
+    داشبورد کاربری | آگروپارس
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                {% render_partial 'user_panel_module.views.user_panel_menu_component' %}
+<style>
+    .dashboard-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        margin-top: 40px;
+        margin-bottom: 80px;
+    }
+    
+    .dashboard-sidebar {
+        width: 100%;
+    }
+    
+    .dashboard-main {
+        flex-grow: 1;
+        width: 100%;
+    }
+    
+    @media (min-width: 992px) {
+        .dashboard-layout {
+            flex-direction: row;
+        }
+        .dashboard-sidebar {
+            width: 320px;
+            flex-shrink: 0;
+        }
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<div class="container">
+    <div class="dashboard-layout">
+        <aside class="dashboard-sidebar">
+            {% render_partial 'user_panel_module.views.user_panel_menu_component' %}
+        </aside>
+        
+        <main class="dashboard-main">
+            <!-- خوش‌آمدگویی -->
+            <div style="background: linear-gradient(135deg, var(--primary) 0%, #047857 100%); border-radius: var(--radius-lg); padding: 32px; color: white; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(5, 150, 105, 0.2);">
+                <div>
+                    <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 8px;">سلام، به آگروپارس خوش آمدید! 🌱</h2>
+                    <p style="opacity: 0.9; font-size: 14px;">از طریق داشبورد می‌توانید سفارشات، آدرس‌ها و اطلاعات حساب خود را مدیریت کنید.</p>
+                </div>
             </div>
-            <div class="col-md-8">
-                <p>this is user dashboard</p>
+
+            <!-- کارت‌های آمار -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    </div>
+                    <div>
+                        <span style="display: block; color: var(--text-muted); font-size: 13px; font-weight: 600;">سفارشات جاری</span>
+                        <strong style="font-size: 20px; color: var(--text-dark); font-weight: 900;">{{ active_orders_count }} سفارش</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <span style="display: block; color: var(--text-muted); font-size: 13px; font-weight: 600;">تحویل شده</span>
+                        <strong style="font-size: 20px; color: var(--text-dark); font-weight: 900;">{{ delivered_orders_count }} سفارش</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fef2f2; color: #ef4444;">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+                    <div>
+                        <span style="display: block; color: var(--text-muted); font-size: 13px; font-weight: 600;">لغو شده</span>
+                        <strong style="font-size: 20px; color: var(--text-dark); font-weight: 900;">{{ canceled_orders_count|default:"0" }} سفارش</strong>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- آخرین سفارشات -->
+            <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden;">
+                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 0;">آخرین سفارشات</h3>
+                    <a href="{% url 'user_panel_orders' %}" style="color: var(--primary); font-size: 13px; font-weight: 700; text-decoration: none;">مشاهده همه ></a>
+                </div>
+                
+                {% if recent_orders %}
+                    <div class="recent-orders-list" style="padding: 16px 24px;">
+                        {% for order in recent_orders %}
+                            <div style="border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <div style="font-weight: 800; color: var(--text-dark);">سفارش #AGR-{{ order.id }}</div>
+                                    <div style="font-size: 13px; color: var(--text-muted);">{{ order.payment_date|date:"Y/m/d" }}</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    {% if order.status == 'pending' %}
+                                        <span style="background: #fef9c3; color: #ca8a04; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">در انتظار پرداخت</span>
+                                    {% elif order.status == 'processing' %}
+                                        <span style="background: #dbeafe; color: #2563eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">در حال پردازش</span>
+                                    {% elif order.status == 'shipped' %}
+                                        <span style="background: #fef08a; color: #854d0e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">ارسال شده</span>
+                                    {% elif order.status == 'delivered' %}
+                                        <span style="background: #d1fae5; color: #059669; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">تحویل شده</span>
+                                    {% elif order.status == 'canceled' %}
+                                        <span style="background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">لغو شده</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                        <img src="{% static 'images/icons/cart.svg' %}" style="width: 48px; opacity: 0.2; margin-bottom: 16px;">
+                        <p style="font-weight: 600;">هنوز هیچ سفارشی ثبت نکرده‌اید.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
     </div>
+</div>
 {% endblock %}

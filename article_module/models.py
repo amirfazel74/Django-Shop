@@ -1,6 +1,7 @@
 from django.db import models
 from jalali_date import date2jalali
 from account_module.models import User
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class ArticleCategory(models.Model):
@@ -22,9 +23,11 @@ class Article(models.Model):
     slug = models.SlugField(max_length=400, db_index=True, allow_unicode=True, verbose_name='عنوان در url')
     image = models.ImageField(upload_to='images/articles', verbose_name='تصویر مقاله')
     short_description = models.TextField(verbose_name='توضیحات کوتاه')
-    text = models.TextField(verbose_name='متن مقاله')
+    text = CKEditor5Field(verbose_name='متن مقاله', config_name='default')
     is_active = models.BooleanField(default=True, verbose_name='فعال / غیرفعال')
     selected_categories = models.ManyToManyField(ArticleCategory, verbose_name='دسته بندی ها')
+    related_articles = models.ManyToManyField('self', blank=True, verbose_name='مقالات مرتبط')
+    related_products = models.ManyToManyField('product_module.Product', blank=True, verbose_name='محصولات مرتبط')
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='نویسنده', null=True, editable=False)
     create_date = models.DateTimeField(auto_now_add=True, editable=False, verbose_name='تاریخ ثبت')
 

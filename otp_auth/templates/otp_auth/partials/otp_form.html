@@ -1,0 +1,42 @@
+<!-- otp_form -->
+{% if error %}
+    <div class="error-box" style="display:none;">{{ error }}</div>
+{% endif %}
+<div class="auth-step">
+    <form class="auth-form" @submit.prevent="submitOtp">
+        <div class="auth-input-group">
+            <input
+                    type="text"
+                    x-model="otpCode"
+                    class="auth-input otp-input"
+                    placeholder="- - - - -"
+                    maxlength="5"
+                    pattern="[0-9]{5}"
+                    inputmode="numeric"
+                    required
+                    autofocus
+            >
+        </div>
+
+        <button type="submit" class="auth-submit-btn" :disabled="isLoading">
+            <span>تایید و ورود</span>
+        </button>
+
+        <button
+                type="button"
+                class="auth-secondary-btn"
+                @click="resendOtp"
+                :disabled="isLoading"
+        >
+            ارسال مجدد کد
+        </button>
+
+        <button
+                type="button"
+                class="auth-link-btn"
+                @click="currentStep = 'phone'; message = ''"
+        >
+            تغییر شماره موبایل
+        </button>
+    </form>
+</div>

@@ -1,0 +1,212 @@
+/* ==========================================================================
+   ۵. صفحه جزئیات محصول (Product Detail Page)
+   هدف: استایل‌های اختصاصی صفحه تکی محصول (گرید ۳ ستونه، تب‌ها، جدول مشخصات، ماشین حساب).
+   ========================================================================== */
+
+.product-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 24px;
+}
+
+@media (min-width: 992px) {
+    .product-detail-grid {
+        grid-template-columns: 400px 1fr 300px;
+        gap: 40px;
+    }
+}
+
+.product-main-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+}
+
+@media (min-width: 1024px) {
+    .product-main-wrapper {
+        grid-template-columns: 420px 1fr;
+        gap: 40px;
+        align-items: start;
+    }
+}
+
+.product-content-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 24px;
+}
+
+@media (min-width: 1200px) {
+    .product-content-split {
+        grid-template-columns: 1fr 340px;
+        gap: 40px;
+        align-items: start;
+    }
+}
+
+/* Tabs */
+.agri-tabs-header {
+    display: flex;
+    gap: 32px;
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    background: #f8fafc;
+    flex-wrap: wrap;
+}
+
+.agri-tab-btn, .figma-tab-btn {
+    background: none;
+    border: none;
+    padding: 16px 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.2s;
+    white-space: nowrap;
+}
+
+.agri-tab-btn.active, .figma-tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .agri-tabs-header {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .agri-tabs-header::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Specs List */
+.specs-list, .specs-list-detail {
+    list-style: none;
+    margin: 24px 0;
+    padding: 0;
+}
+
+.specs-list-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.specs-list li, .specs-list-detail li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+}
+
+.specs-list li span:first-child, .specs-list-detail li span:first-child {
+    color: var(--text-muted);
+}
+
+.specs-list li span:last-child, .specs-list-detail li span:last-child {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Figma Specific Detail Components */
+.figma-img-box {
+    background-color: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 24px;
+}
+
+.figma-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.figma-thumb.active {
+    border-color: var(--primary);
+}
+
+.figma-specs-table {
+    width: 100%;
+    margin: 24px 0;
+}
+
+.figma-specs-table td {
+    padding: 10px 0;
+    font-size: 14px;
+}
+
+.figma-specs-table td.label {
+    color: var(--text-muted);
+    width: 120px;
+}
+
+.figma-specs-table td.value {
+    font-weight: 700;
+    color: var(--text-dark);
+    text-align: right;
+}
+
+.figma-sidebar-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.figma-calc-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: white;
+}
+
+.figma-calc-input:focus {
+    border-color: var(--secondary);
+}
+
+.figma-comp-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    background: white;
+    text-decoration: none;
+    transition: border-color 0.2s;
+}
+
+.figma-comp-card:hover {
+    border-color: var(--primary);
+}

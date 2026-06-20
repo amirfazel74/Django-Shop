@@ -1,0 +1,48 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block title %}
+خطا در پرداخت
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container" style="margin-top: 40px; margin-bottom: 40px;">
+    <!-- Stepper -->
+    <div class="checkout-stepper">
+        <div class="step active completed">
+            <div class="step-circle"><i class="fa fa-check"></i></div>
+            <div class="step-label">سبد خرید</div>
+        </div>
+        <div class="step-line active"></div>
+        <div class="step active completed">
+            <div class="step-circle"><i class="fa fa-check"></i></div>
+            <div class="step-label">اطلاعات ارسال</div>
+        </div>
+        <div class="step-line active"></div>
+        <div class="step active error">
+            <div class="step-circle" style="background: #ef4444;"><i class="fa fa-times"></i></div>
+            <div class="step-label" style="color: #ef4444;">پرداخت</div>
+        </div>
+    </div>
+
+    <div class="status-page-wrapper">
+        <div class="status-card error">
+            <div class="status-icon">
+                <i class="fa fa-times-circle" style="color: #ef4444;"></i>
+            </div>
+            <h2>پرداخت ناموفق بود!</h2>
+            <p>{{ message }}</p>
+            <p style="color: #64748b; font-size: 14px; margin-top: 10px;">در صورت کسر مبلغ از حساب شما، وجه پرداختی طی ۷۲ ساعت آینده توسط بانک استرداد خواهد شد.</p>
+            
+            <div class="status-actions">
+                <a href="{% url 'order_module:checkout_shipping' %}" class="btn-checkout-primary" style="display: inline-block; width: auto; padding: 12px 32px;">تلاش مجدد برای پرداخت</a>
+                <a href="{% url 'user_panel_dashboard' %}" class="btn-return-shop" style="margin-top: 15px;">مشاهده سفارش در داشبورد</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

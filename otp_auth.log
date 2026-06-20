@@ -1,0 +1,18 @@
+INFO 2026-06-12 20:40:25,015 services OTP generated for 09123456789: 98354 (Purpose: LOGIN)
+INFO 2026-06-12 20:55:07,043 services OTP generated for 09123456789: 59585 (Purpose: LOGIN)
+ERROR 2026-06-12 20:55:07,047 services Failed to send SMS to 09123456789
+INFO 2026-06-20 02:08:00,911 views User None logged out
+INFO 2026-06-20 02:08:10,499 services OTP generated for 09912392891: 33155 (Purpose: LOGIN)
+INFO 2026-06-20 02:10:53,976 services OTP generated for 09912392891: 37327 (Purpose: LOGIN)
+INFO 2026-06-20 02:11:11,588 services OTP verified successfully for 09912392891 (Purpose: LOGIN)
+ERROR 2026-06-20 02:11:30,255 views Error creating user 09912392891: NOT NULL constraint failed: account_module_user.email_active_code
+ERROR 2026-06-20 02:11:40,632 views Error creating user 09912392891: NOT NULL constraint failed: account_module_user.email_active_code
+INFO 2026-06-20 02:15:10,460 services OTP generated for 09136066223: 27755 (Purpose: LOGIN)
+INFO 2026-06-20 02:15:24,554 services OTP verified successfully for 09136066223 (Purpose: LOGIN)
+INFO 2026-06-20 02:15:41,300 views New user registered: 09136066223 (سید امیر محمد فاضل)
+INFO 2026-06-20 02:16:50,248 views User 09136066223 logged out
+INFO 2026-06-20 02:17:06,053 views User 09136066223 logged in with password
+INFO 2026-06-20 02:52:55,384 views User 09136066223 logged in with password
+INFO 2026-06-20 03:01:43,377 views User 09136066223 logged out
+INFO 2026-06-20 03:06:54,719 views User 09136066223 logged in with password
+INFO 2026-06-20 03:11:29,256 views User 09136066223 logged out

@@ -1,10 +1,21 @@
-{% extends 'shared/_layout.html' %}
+{% extends 'shared/base.html' %}
 {% load render_partial %}
 {% load poll_extras %}
 {% load thumbnail %}
 
 {% block title %}
     جزییات مقاله
+{% endblock %}
+
+{% block extra_head %}
+    <meta property="og:title" content="{{ article.title }}">
+    <meta property="og:description" content="{{ article.short_description|default:''|striptags }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    {% if article.image %}
+        <meta property="og:image" content="{{ request.build_absolute_uri|slice:':-1' }}{{ article.image.url }}">
+    {% endif %}
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
 {% endblock %}
 
 {% block content %}
@@ -15,37 +26,61 @@
                 <div class="col-sm-9">
                     <div class="blog-post-area">
                         <h2 class="title text-center">{{ article.title }}</h2>
-                        <div class="single-blog-post">
-                            <h3>{{ article.title }}</h3>
-                            <div class="post-meta">
-                                <ul>
-                                    {% if article.author is not None %}
-                                        <li><i class="fa fa-user"></i> {{ article.author }}</li>
-                                    {% endif %}
-                                    <li><i class="fa fa-clock-o"></i>{{ article.get_jalali_create_time }}</li>
-                                    <li><i class="fa fa-calendar"></i>{{ article.create_date | show_jalali_date }}
-                                    </li>
-                                </ul>
-                                <span>
-										<i class="fa fa-star"></i>
-										<i class="fa fa-star"></i>
-										<i class="fa fa-star"></i>
-										<i class="fa fa-star"></i>
-										<i class="fa fa-star-half-o"></i>
-								</span>
-                            </div>
-                            <a href="">
+                        <article class="single-blog-post">
+                            <header>
+                                <h3>{{ article.title }}</h3>
+                                <div class="post-meta">
+                                    <ul>
+                                        {% if article.author is not None %}
+                                            <li><i class="fa fa-user"></i> {{ article.author }}</li>
+                                        {% endif %}
+                                        <li><i class="fa fa-clock-o"></i>{{ article.get_jalali_create_time }}</li>
+                                        <li><i class="fa fa-calendar"></i>{{ article.create_date | show_jalali_date }}</li>
+                                    </ul>
+                                </div>
+                            </header>
+                            
+                            <figure>
                                 {% thumbnail article.image "862x398" quality=95 crop='center' as im %}
-                                    <img src="{{ im.url }}">
+                                    <img src="{{ im.url }}" alt="{{ article.title }}" loading="lazy" style="width:100%; border-radius:8px; margin-bottom:20px;">
                                 {% endthumbnail %}
-                            </a>
-                            <p>
-                                {{ article.short_description }}
-                            </p>
-                            <p>
-                                {{ article.text }}
-                            </p>
-                        </div>
+                            </figure>
+                            
+                            <section class="ck-content" style="line-height: 2; font-size: 16px; color: #333; text-align: justify;">
+                                <strong>{{ article.short_description }}</strong>
+                                <hr style="margin: 20px 0;">
+                                {{ article.text|safe }}
+                            </section>
+                            
+                            {% if article.related_products.all %}
+                                <section class="related-products" style="margin-top: 40px;">
+                                    <h4>محصولات مرتبط با این مقاله</h4>
+                                    <div style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px;">
+                                        {% for product in article.related_products.all %}
+                                            <div style="min-width: 200px; border: 1px solid #ddd; padding: 12px; border-radius: 8px;">
+                                                <a href="{{ product.get_absolute_url }}">
+                                                    {% if product.image %}
+                                                        <img src="{{ product.image.url }}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" loading="lazy">
+                                                    {% endif %}
+                                                    <h5 style="font-size: 14px; text-align: center;">{{ product.title }}</h5>
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </section>
+                            {% endif %}
+                            
+                            {% if article.related_articles.all %}
+                                <section class="related-articles" style="margin-top: 40px;">
+                                    <h4>مقالات مرتبط</h4>
+                                    <ul>
+                                        {% for rel_article in article.related_articles.all %}
+                                            <li><a href="{% url 'articles_detail' rel_article.id %}">{{ rel_article.title }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </section>
+                            {% endif %}
+                        </article>
                     </div><!--/blog-post-area-->
 
 

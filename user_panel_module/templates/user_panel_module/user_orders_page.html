@@ -1,0 +1,258 @@
+{% extends 'shared/base.html' %}
+{% load render_partial %}
+{% load static %}
+{% load poll_extras %}
+
+{% block title %}
+سفارشات من | آگروپارس
+{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        margin-top: 40px;
+        margin-bottom: 80px;
+    }
+    
+    .dashboard-sidebar { width: 100%; }
+    .dashboard-main { flex-grow: 1; width: 100%; }
+    
+    @media (min-width: 992px) {
+        .dashboard-layout { flex-direction: row; }
+        .dashboard-sidebar { width: 320px; flex-shrink: 0; }
+    }
+
+    /* Tabs */
+    .orders-tabs {
+        display: flex;
+        gap: 24px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 24px;
+        padding: 0 16px;
+    }
+
+    .order-tab {
+        padding: 16px 0;
+        font-weight: 700;
+        color: var(--text-muted);
+        cursor: pointer;
+        position: relative;
+        font-size: 15px;
+    }
+
+    .order-tab.active {
+        color: var(--primary);
+    }
+
+    .order-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary);
+        border-radius: 3px 3px 0 0;
+    }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Order Card */
+    .order-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        margin-bottom: 16px;
+        background: white;
+    }
+
+    .order-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        background: #f8fafc;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .order-body {
+        padding: 24px;
+    }
+    
+    .order-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+    }
+
+    .order-info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .order-info-item .label {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+    
+    .order-info-item .value {
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .order-products {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+    }
+
+    .order-product-img {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        object-fit: contain;
+        padding: 4px;
+    }
+</style>
+
+<div class="container" x-data="{ activeTab: 'active' }">
+    <div class="dashboard-layout">
+        <aside class="dashboard-sidebar">
+            {% render_partial 'user_panel_module.views.user_panel_menu_component' %}
+        </aside>
+        
+        <main class="dashboard-main">
+            <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                <!-- Tabs Header -->
+                <div class="orders-tabs">
+                    <div class="order-tab" :class="{ 'active': activeTab === 'active' }" @click="activeTab = 'active'">
+                        جاری <span style="background: #f1f5f9; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 4px;">{{ active_orders.count }}</span>
+                    </div>
+                    <div class="order-tab" :class="{ 'active': activeTab === 'delivered' }" @click="activeTab = 'delivered'">
+                        تحویل شده <span style="background: #f1f5f9; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 4px;">{{ delivered_orders.count }}</span>
+                    </div>
+                    <div class="order-tab" :class="{ 'active': activeTab === 'canceled' }" @click="activeTab = 'canceled'">
+                        لغو شده <span style="background: #f1f5f9; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 4px;">{{ canceled_orders.count }}</span>
+                    </div>
+                </div>
+
+                <!-- Active Orders -->
+                <div class="tab-content" :class="{ 'active': activeTab === 'active' }" style="padding: 0 24px 24px;">
+                    {% if active_orders %}
+                        {% for order in active_orders %}
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="font-weight: 900; font-size: 16px;">سفارش #AGR-{{ order.id }}</div>
+                                        {% if order.status == 'pending' %}
+                                            <span style="background: #fef9c3; color: #ca8a04; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">در انتظار پرداخت</span>
+                                        {% elif order.status == 'processing' %}
+                                            <span style="background: #dbeafe; color: #2563eb; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">در حال پردازش</span>
+                                        {% elif order.status == 'shipped' %}
+                                            <span style="background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">ارسال شده با {{ order.get_shipping_method_display }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div style="font-size: 14px; color: var(--text-muted); font-weight: 600;">
+                                        {{ order.payment_date|date:"Y/m/d H:i" }}
+                                    </div>
+                                </div>
+                                <div class="order-body">
+                                    <div class="order-grid">
+                                        <div class="order-info-item">
+                                            <span class="label">مبلغ کل سفارش</span>
+                                            <span class="value">{{ order.calculate_total_price|three_digits_currency }} تومان</span>
+                                        </div>
+                                        <div class="order-info-item">
+                                            <span class="label">هزینه ارسال</span>
+                                            <span class="value">{% if order.shipping_cost > 0 %}{{ order.shipping_cost|three_digits_currency }} تومان{% else %}پس‌کرایه{% endif %}</span>
+                                        </div>
+                                        {% if order.tracking_code %}
+                                        <div class="order-info-item">
+                                            <span class="label">کد رهگیری مرسوله</span>
+                                            <span class="value" style="color: var(--primary);">{{ order.tracking_code }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="order-products">
+                                        {% for detail in order.orderdetail_set.all %}
+                                            <img src="{{ detail.product.image.url }}" class="order-product-img" title="{{ detail.product.title }} ({{ detail.count }} عدد)">
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                            <img src="{% static 'images/icons/box.svg' %}" style="width: 48px; opacity: 0.2; margin-bottom: 16px;">
+                            <p style="font-weight: 600;">هیچ سفارش جاری یافت نشد.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Delivered Orders -->
+                <div class="tab-content" :class="{ 'active': activeTab === 'delivered' }" style="padding: 0 24px 24px;">
+                    {% if delivered_orders %}
+                        {% for order in delivered_orders %}
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="font-weight: 900; font-size: 16px;">سفارش #AGR-{{ order.id }}</div>
+                                        <span style="background: #d1fae5; color: #059669; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">تحویل شده</span>
+                                    </div>
+                                    <div style="font-size: 14px; color: var(--text-muted); font-weight: 600;">
+                                        {{ order.payment_date|date:"Y/m/d H:i" }}
+                                    </div>
+                                </div>
+                                <div class="order-body">
+                                    <div class="order-grid">
+                                        <div class="order-info-item">
+                                            <span class="label">مبلغ کل سفارش</span>
+                                            <span class="value">{{ order.calculate_total_price|three_digits_currency }} تومان</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                            <img src="{% static 'images/icons/box.svg' %}" style="width: 48px; opacity: 0.2; margin-bottom: 16px;">
+                            <p style="font-weight: 600;">هیچ سفارش تحویل شده‌ای یافت نشد.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Canceled Orders -->
+                <div class="tab-content" :class="{ 'active': activeTab === 'canceled' }" style="padding: 0 24px 24px;">
+                    {% if canceled_orders %}
+                        {% for order in canceled_orders %}
+                            <div class="order-card">
+                                <div class="order-header" style="opacity: 0.7;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="font-weight: 900; font-size: 16px;">سفارش #AGR-{{ order.id }}</div>
+                                        <span style="background: #fee2e2; color: #dc2626; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">لغو شده</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                            <img src="{% static 'images/icons/box.svg' %}" style="width: 48px; opacity: 0.2; margin-bottom: 16px;">
+                            <p style="font-weight: 600;">هیچ سفارش لغو شده‌ای یافت نشد.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

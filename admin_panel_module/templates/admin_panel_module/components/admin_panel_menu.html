@@ -1,0 +1,43 @@
+{% load static %}
+<div class="user-panel-menu" style="background: #1e293b; color: white; border-radius: var(--radius-lg); padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 100px;">
+    <div class="profile-header" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px;">
+        <img src="{% static 'images/icons/user.svg' %}" alt="Admin" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #3b82f6; padding: 4px; filter: brightness(0) invert(1);">
+        <h3 style="margin: 12px 0 4px 0; font-size: 18px; font-weight: 800; color: white;">مدیریت سایت</h3>
+        <span style="font-size: 12px; color: #94a3b8; display: block; font-weight: 500;">پنل اختصاصی مدیر</span>
+    </div>
+    
+    <nav class="panel-nav">
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+            <li>
+                <a href="{% url 'admin_panel_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_panel_dashboard' %}active{% endif %}" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: #cbd5e1; text-decoration: none; font-weight: 600; transition: all 0.2s;">
+                    <i class="fa fa-tachometer"></i> داشبورد آماری
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin_orders_list' %}" class="nav-link {% if 'order' in request.resolver_match.url_name %}active{% endif %}" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: #cbd5e1; text-decoration: none; font-weight: 600; transition: all 0.2s;">
+                    <i class="fa fa-shopping-basket"></i> مدیریت سفارشات
+                </a>
+            </li>
+            <li>
+                <a href="/admin/" target="_blank" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: #cbd5e1; text-decoration: none; font-weight: 600; transition: all 0.2s;">
+                    <i class="fa fa-database"></i> پنل پیش‌فرض جنگو
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'otp_auth:logout' %}" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: #ef4444; text-decoration: none; font-weight: 600; transition: all 0.2s; margin-top: 16px;">
+                    <i class="fa fa-sign-out"></i> خروج
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<style>
+    .panel-nav .nav-link:hover {
+        background: rgba(255,255,255,0.1);
+        color: white !important;
+    }
+    .panel-nav .nav-link.active {
+        background: #3b82f6;
+        color: white !important;
+    }
+</style>

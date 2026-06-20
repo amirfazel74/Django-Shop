@@ -1,8 +1,62 @@
-<script src="/static/js/jquery.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/jquery.scrollUp.min.js"></script>
-<script src="/static/js/price-range.js"></script>
-<script src="/static/js/jquery.prettyPhoto.js"></script>
-<script src="/static/js/main.js"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/static/js/custom.js"></script>
+<footer style="background-color: #111827; color: #9ca3af; padding-top: 64px; padding-bottom: 48px; border-top: 4px solid var(--primary); margin-top: 60px;">
+    <div class="container" style="display: grid; grid-template-cols: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px;">
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px; color: white;">
+                <div class="flex-center"
+                     style="width: 36px; height: 36px; background-color: var(--primary); color: white; rounded-radius: var(--radius-md); font-weight: bold; border-radius: 6px;">
+                    آگر
+                </div>
+                <span style="font-weight: 800; font-size: 18px;">آگروپارس</span>
+            </div>
+            <p style="font-size: 14px; line-height: 1.7; color: #9ca3af; text-align: justify;">
+                تامین‌کننده تخصصی نهاده‌های کشاورزی، سموم دفع آفات و تجهیزات ایمنی با تاییدیه جهاد کشاورزی و ارسال
+                هوشمند متناسب با محدودیت‌های پستی و باربری به سراسر کشور.
+            </p>
+        </div>
+
+        <div>
+            <h3 style="color: white; font-size: 16px; font-weight: 700; margin-bottom: 20px;">🔗 دسترسی سریع</h3>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+                {% for box in footer_link_boxes %}
+                    {% for link in box.footerlink_set.all %}
+                        <li><a href="{{ link.url }}"
+                               style="color: #9ca3af; text-decoration: none; transition: color 0.2s;"
+                               onmouseover="this.style.color='#059669'"
+                               onmouseout="this.style.color='#9ca3af'">{{ link.title }}</a></li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div>
+            <h3 style="color: white; font-size: 16px; font-weight: 700; margin-bottom: 20px;">📞 ارتباط با انبار
+                مرکزی</h3>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+                <li>☎️ تلفن دفتر مرکزی: {{ site_setting.phone }}</li>
+                <li>📧 پست الکترونیک: {{ site_setting.email|default:"info@agropars.ir" }}</li>
+                <li style="line-height: 1.5;">📍 دفتر مرکزی و انبار: {{ site_setting.address }}</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 style="color: white; font-size: 16px; font-weight: 700; margin-bottom: 20px;">🛡️ مجوزها و تاییدیه
+                رسمی</h3>
+            <div style="display: flex; gap: 12px;">
+                <div class="flex-center"
+                     style="width: 90px; height: 110px; background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #6b7280; font-size: 12px; text-align: center; padding: 8px;">
+                    سازمان حفظ نباتات
+                </div>
+                <div class="flex-center"
+                     style="width: 90px; height: 110px; background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); color: #6b7280; font-size: 12px; text-align: center; padding: 8px;">
+                    نماد الکترونیک
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container"
+         style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 48px; padding-top: 24px; text-align: center; font-size: 12px; color: #6b7280;">
+        <p>تمامی حقوق مادی و معنوی این پلتفرم متعلق به مجموعه آگروپارس می‌باشد.</p>
+    </div>
+</footer>

@@ -1,0 +1,60 @@
+<!-- complete_profile_form -->
+{% if error %}
+    <div class="error-box" style="display:none;">{{ error }}</div>
+{% endif %}
+<div class="auth-step">
+    <form class="auth-form" @submit.prevent="submitProfile">
+        <div class="auth-input-group">
+            <input
+                    type="text"
+                    x-model="firstName"
+                    class="auth-input"
+                    placeholder="نام"
+                    autocomplete="given-name"
+                    required
+            >
+        </div>
+
+        <div class="auth-input-group">
+            <input
+                    type="text"
+                    x-model="lastName"
+                    class="auth-input"
+                    placeholder="نام خانوادگی"
+                    autocomplete="family-name"
+                    required
+            >
+        </div>
+
+        <!-- فیلد پنهان برای جلوگیری از اشتباه مرورگر در ذخیره رمز عبور -->
+        <input type="text" autocomplete="username" value="{{ mobile }}" style="display: none;" aria-hidden="true">
+
+        <div class="auth-input-group">
+            <input
+                    type="password"
+                    x-model="password"
+                    class="auth-input"
+                    placeholder="رمز عبور (حداقل ۶ کاراکتر)"
+                    autocomplete="new-password"
+                    minlength="6"
+                    required
+            >
+        </div>
+
+        <div class="auth-input-group">
+            <input
+                    type="password"
+                    x-model="passwordConfirm"
+                    class="auth-input"
+                    placeholder="تکرار رمز عبور"
+                    autocomplete="new-password"
+                    minlength="6"
+                    required
+            >
+        </div>
+
+        <button type="submit" class="auth-submit-btn" :disabled="isLoading">
+            <span>ثبت‌نام و ورود</span>
+        </button>
+    </form>
+</div>

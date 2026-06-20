@@ -1,0 +1,360 @@
+/* ==========================================================================
+   صفحه احراز هویت (Authentication Page)
+   هدف: طراحی مستقل و مدرن برای صفحه ورود/ثبت‌نام
+   ========================================================================== */
+
+/* -------------------------------------
+   لایوت اصلی صفحه (Full Screen)
+   ------------------------------------- */
+.auth-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #d1fae5 100%);
+}
+
+/* الگوی پس‌زمینه (Pattern) */
+.auth-page-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 30%, rgba(5, 150, 105, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(217, 119, 6, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* -------------------------------------
+   کارت اصلی احراز هویت
+   ------------------------------------- */
+.auth-card {
+    background: var(--surface);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    width: 100%;
+    max-width: 440px;
+    padding: 28px 24px;
+    position: relative;
+    z-index: 10;
+    animation: authCardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes authCardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* -------------------------------------
+   هدر کارت (لوگو و عنوان)
+   ------------------------------------- */
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-logo {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.3);
+}
+
+.auth-logo svg {
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+.auth-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* -------------------------------------
+   فرم‌ها و اینپوت‌ها
+   ------------------------------------- */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.auth-input-icon {
+    position: absolute;
+    right: 16px;
+    width: 20px;
+    height: 20px;
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 14px 48px 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: var(--surface);
+    transition: all 0.2s;
+    outline: none;
+}
+
+.auth-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+}
+
+.auth-input:focus + .auth-input-icon,
+.auth-input:focus ~ .auth-input-icon {
+    color: var(--primary);
+}
+
+.auth-input::placeholder {
+    color: #9ca3af;
+}
+
+/* اینپوت کد OTP (با فاصله بین ارقام) */
+.auth-input.otp-input {
+    text-align: center;
+    letter-spacing: 0.5em;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 16px;
+    direction: ltr;
+}
+
+/* -------------------------------------
+   دکمه اصلی
+   ------------------------------------- */
+.auth-submit-btn {
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.auth-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.35);
+}
+
+.auth-submit-btn:active {
+    transform: translateY(0);
+}
+
+.auth-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* -------------------------------------
+   دکمه‌های ثانویه (لینک‌ها)
+   ------------------------------------- */
+.auth-secondary-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.auth-secondary-btn:hover {
+    background: var(--bg-site);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.auth-link-btn {
+    width: 100%;
+    padding: 8px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 0.2s;
+    text-align: center;
+}
+
+.auth-link-btn:hover {
+    color: var(--primary);
+}
+
+/* -------------------------------------
+   پیام‌های خطا و موفقیت
+   ------------------------------------- */
+.auth-message {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    animation: messageSlide 0.3s ease;
+}
+
+@keyframes messageSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-message.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: var(--color-danger);
+}
+
+.auth-message.success {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: var(--primary-hover);
+}
+
+.auth-message.info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+}
+
+/* -------------------------------------
+   انیمیشن تغییر مراحل
+   ------------------------------------- */
+.auth-step {
+    animation: stepFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes stepFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* -------------------------------------
+   تایمر شمارش معکوس
+   ------------------------------------- */
+.auth-timer {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 12px;
+    font-weight: 600;
+}
+
+.auth-timer span {
+    color: var(--primary);
+    font-weight: 700;
+    direction: ltr;
+    display: inline-block;
+}
+
+/* -------------------------------------
+   فوتر کارت (لینک‌های پایین)
+   ------------------------------------- */
+.auth-footer {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.auth-footer-text {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.auth-footer-text a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s;
+}
+
+.auth-footer-text a:hover {
+    color: var(--primary-hover);
+}
+
+/* -------------------------------------
+   ریسپانسیو
+   ------------------------------------- */
+@media (min-width: 481px) {
+    .auth-card {
+        padding: 40px;
+        border-radius: 24px;
+    }
+
+    .auth-title {
+        font-size: 24px;
+    }
+
+    .auth-logo {
+        width: 64px;
+        height: 64px;
+    }
+}

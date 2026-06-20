@@ -1,0 +1,81 @@
+{% extends 'shared/base.html' %}
+{% load render_partial %}
+{% load poll_extras %}
+
+{% block title %}مدیریت سفارشات | آگروپارس{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-layout {
+        display: flex; flex-direction: column; gap: 32px; margin-top: 40px; margin-bottom: 80px;
+    }
+    .dashboard-sidebar { width: 100%; }
+    .dashboard-main { flex-grow: 1; width: 100%; }
+    @media (min-width: 992px) {
+        .dashboard-layout { flex-direction: row; }
+        .dashboard-sidebar { width: 320px; flex-shrink: 0; }
+    }
+</style>
+
+<div class="container">
+    <div class="dashboard-layout">
+        <aside class="dashboard-sidebar">
+            {% render_partial 'admin_panel_module.views.admin_panel_menu_component' %}
+        </aside>
+        
+        <main class="dashboard-main">
+            <div style="background: white; border-radius: var(--radius-lg); padding: 24px; border: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                    <h2 style="font-size: 20px; font-weight: 800;">لیست تمامی سفارشات</h2>
+                    
+                    <form method="GET" style="display: flex; gap: 8px;">
+                        <select name="status" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); outline: none;" onchange="this.form.submit()">
+                            <option value="">همه سفارشات</option>
+                            <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>در انتظار پرداخت</option>
+                            <option value="processing" {% if current_status == 'processing' %}selected{% endif %}>در حال پردازش</option>
+                            <option value="shipped" {% if current_status == 'shipped' %}selected{% endif %}>ارسال شده</option>
+                            <option value="delivered" {% if current_status == 'delivered' %}selected{% endif %}>تحویل شده</option>
+                            <option value="canceled" {% if current_status == 'canceled' %}selected{% endif %}>لغو شده</option>
+                        </select>
+                    </form>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: right;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--bg-site); color: var(--text-muted); font-size: 13px;">
+                                <th style="padding: 12px 16px;">کد سفارش</th>
+                                <th style="padding: 12px 16px;">مشتری</th>
+                                <th style="padding: 12px 16px;">مبلغ کل</th>
+                                <th style="padding: 12px 16px;">روش ارسال</th>
+                                <th style="padding: 12px 16px;">وضعیت پردازش</th>
+                                <th style="padding: 12px 16px;">عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr style="border-bottom: 1px solid var(--bg-site); transition: background 0.2s;">
+                                <td style="padding: 16px; font-weight: bold;">#{{ order.id }}</td>
+                                <td style="padding: 16px;">{{ order.first_name|default:order.user.username }} {{ order.last_name|default:"" }}</td>
+                                <td style="padding: 16px; font-weight: bold;">{{ order.calculate_total_price|three_digits_currency }} تومان</td>
+                                <td style="padding: 16px;">{{ order.get_shipping_method_display|default:"-" }}</td>
+                                <td style="padding: 16px;">
+                                    <span style="padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; background: #eff6ff; color: #3b82f6;">{{ order.get_status_display }}</span>
+                                </td>
+                                <td style="padding: 16px;">
+                                    <a href="{% url 'admin_order_detail' order.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">مدیریت <i class="fa fa-angle-left"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted);">سفارشی با این شرایط یافت نشد.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

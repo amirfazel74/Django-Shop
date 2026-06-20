@@ -1,89 +1,86 @@
 {% load poll_extras %}
 
-{% if order.orderdetail_set.all %}
-    <section id="cart_items">
-        <div class="container">
-            <div class="breadcrumbs">
-                <ol class="breadcrumb">
-                    <li><a href="#">خانـه</a></li>
-                    <li class="active">پرداخت</li>
-                </ol>
-            </div><!--/breadcrums-->
-            <div class="table-responsive cart_info">
-                <table class="table table-condensed">
-                    <thead>
-                    <tr class="cart_menu">
-                        <td class="image">کـالا</td>
-                        <td class="description"></td>
-                        <td class="price">قیمت</td>
-                        <td class="quantity">تعـداد</td>
-                        <td class="total">مجمـوع</td>
-                        <td></td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for detail in order.orderdetail_set.all %}
-                        <tr>
-                            <td class="cart_product">
-                                <a href=""><img src="{{ detail.product.image.url }}" width="75" alt=""></a>
-                            </td>
-                            <td class="cart_description">
-                                <h4><a href="" class="one-line-text">{{ detail.product.title }}</a></h4>
-                                <p>شناسـه : {{ detail.product.id }}</p>
-                            </td>
-                            <td class="cart_price">
-                                <p>{{ detail.product.price|three_digits_currency }}</p>
-                            </td>
-                            <td class="cart_quantity">
-                                <div class="cart_quantity_button">
-                                    <a class="cart_quantity_up cursor-pointer"
-                                       onclick="changeOrderDetailCount({{ detail.id }}, 'increase')"> + </a>
-                                    <input class="cart_quantity_input" type="text" name="quantity"
-                                           value="{{ detail.count }}"
-                                           autocomplete="off" size="2">
-                                    <a class="cart_quantity_down  cursor-pointer"
-                                       onclick="changeOrderDetailCount({{ detail.id }}, 'decrease')"> - </a>
-                                </div>
-                            </td>
-                            <td class="cart_total">
-                                <p class="cart_total_price"> {% multiply detail.count detail.product.price %} </p>
-                                {# <p class="cart_total_price"> {{ detail.get_total_price|three_digits_currency }} </p>#}
-                            </td>
-                            <td class="cart_delete">
-                                <a class="cart_quantity_delete" onclick="removeOrderDetail({{ detail.id }})"><i
-                                        class="fa fa-times"></i></a>
-                            </td>
-                        </tr>
-                    {% endfor %}
+{% load poll_extras %}
 
-
-                    </tbody>
-                </table>
-            </div>
+<div class="checkout-container">
+    <!-- Stepper -->
+    <div class="checkout-stepper">
+        <div class="step active">
+            <div class="step-circle"><i class="fa fa-check"></i></div>
+            <div class="step-label">سبد خرید</div>
         </div>
-    </section>
-    <section id="do_action">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="total_area">
-                        <ul>
-                            <li>مجمـوع سبـد خریـد <span>{{ sum|three_digits_currency }}</span></li>
-                        </ul>
-                        <a class="btn btn-default check_out" href="checkout.html">پرداخت</a>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="step-circle">۲</div>
+            <div class="step-label">اطلاعات ارسال</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="step-circle">۳</div>
+            <div class="step-label">پرداخت</div>
+        </div>
+    </div>
+
+    {% if order.orderdetail_set.all %}
+    <div class="checkout-grid">
+        <!-- Cart Items -->
+        <div class="checkout-main">
+            <div class="cart-items-wrapper">
+                {% for detail in order.orderdetail_set.all %}
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        <img src="{{ detail.product.image.url }}" alt="{{ detail.product.title }}">
+                    </div>
+                    <div class="cart-item-details">
+                        <h4 class="cart-item-title"><a href="#">{{ detail.product.title }}</a></h4>
+                        
+                        <div class="cart-item-actions">
+                            <div class="quantity-control">
+                                <button type="button" class="qty-btn" onclick="changeOrderDetailCount({{ detail.id }}, 'increase')">+</button>
+                                <span class="qty-value">{{ detail.count }}</span>
+                                <button type="button" class="qty-btn" onclick="changeOrderDetailCount({{ detail.id }}, 'decrease')">-</button>
+                            </div>
+                            <button class="delete-btn" onclick="removeOrderDetail({{ detail.id }})">
+                                <i class="fa fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cart-item-price-box">
+                        <div class="unit-price">{{ detail.product.price|three_digits_currency }} <small>تومان</small></div>
+                        <div class="total-price">مجموع: {% multiply detail.count detail.product.price %} <small>تومان</small></div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
-    </section>
-{% else %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="alert alert-warning">
-                    <p>سبد خرید شما خالی می باشد</p>
+
+        <!-- Summary Sidebar -->
+        <div class="checkout-sidebar">
+            <div class="summary-box">
+                <h3 class="summary-title">خلاصه سفارش</h3>
+                <div class="summary-row">
+                    <span>تعداد کالاها</span>
+                    <span>{{ order.orderdetail_set.count }} عدد</span>
                 </div>
+                <div class="summary-row">
+                    <span>مبلغ کالاها</span>
+                    <span>{{ sum|three_digits_currency }} تومان</span>
+                </div>
+                <hr class="summary-divider">
+                <div class="summary-row total-row">
+                    <span>مبلغ قابل پرداخت</span>
+                    <span class="total-amount">{{ sum|three_digits_currency }} <small>تومان</small></span>
+                </div>
+                <a href="{% url 'order_module:checkout_shipping' %}" class="btn-checkout-primary">تایید و ادامه <i class="fa fa-arrow-left"></i></a>
             </div>
         </div>
     </div>
-{% endif %}
+    {% else %}
+    <div class="empty-cart-state">
+        <img src="/static/images/icons/cart.svg" alt="سبد خرید خالی" class="empty-cart-icon">
+        <h3>سبد خرید شما خالی است!</h3>
+        <p>می‌توانید به صفحه فروشگاه برگردید و محصولات مورد نیاز خود را اضافه کنید.</p>
+        <a href="/" class="btn-return-shop">بازگشت به فروشگاه</a>
+    </div>
+    {% endif %}
+</div>

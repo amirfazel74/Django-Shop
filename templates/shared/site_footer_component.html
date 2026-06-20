@@ -1,73 +1,94 @@
-<footer id="footer"><!--Footer-->
-    <div class="footer-Before">
-        <div class="container">
-            <div class="block-news">
-                <div class="row">
-                    <h3>با عضویت در خبـرنامه ما از تخفیفات ویـژه ما با خبـر شوید ... </h3>
-                    <div class="searchform newslatter">
-                        <input type="text" placeholder="آدرس ایمیـل شما ..."/>
-                        <button type="submit" class="btn btn-default">
-                            <i class="fa fa-arrow-circle-o-left"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{% load static %}
 
-    <div class="footer-top">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-3">
-                    <div class="address">
-                        <img src="/static/images/home/map.png" alt=""/>
+<footer style="background-color: var(--surface); border-top: 1px solid var(--border); margin-top: 64px;">
+    
+    <div class="container" style="padding-top: 64px; padding-bottom: 48px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 48px;">
+            
+            <!-- درباره سایت و لوگو -->
+            <div>
+                <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none; margin-bottom: 24px;">
+                    <div style="width: 44px; height: 44px; background-color: var(--primary); color: white; font-weight: 800; font-size: 20px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        آگر
                     </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="address">
-                        <img src="/static/images/home/map.png" alt=""/>
+                    <div>
+                        <h2 style="font-size: 20px; font-weight: 900; color: var(--primary); line-height: 1;">آگروپارس</h2>
+                        <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">تجهیزات و نهاده‌های کشاورزی</span>
                     </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="companyinfo">
-                        <h2>{{ site_setting.site_name }}</h2>
-                        <h4>درباره ما :</h4>
-                        <p>{{ site_setting.about_us_text }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer-widget">
-        <div class="container">
-            <div class="row">
-                {% for footer_link_box in footer_link_boxes %}
-                    <div class="col-sm-3 pull-right">
-                        <div class="single-widget">
-                            <h2>{{ footer_link_box.title }}</h2>
-                            <ul class="nav nav-pills nav-stacked">
-                                {% for link in footer_link_box.footerlink_set.all %}
-                                    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-                                {% endfor %}
-
-                            </ul>
-                        </div>
-                    </div>
-                {% endfor %}
-
-            </div>
-        </div>
-    </div>
-
-    <div class="footer-bottom" style="direction: ltr !important;">
-        <div class="container">
-            <div class="row">
-                <p class="pull-right">
-                    {{ site_setting.copy_right }}
+                </a>
+                <p style="color: var(--text-muted); font-size: 14px; line-height: 1.8; text-align: justify; margin-bottom: 24px;">
+                    {{ site_setting.about_us_text|default:"فروشگاه آگروپارس، با تکیه بر دانش روز و تجربه متخصصان کشاورزی، ارائه‌دهنده باکیفیت‌ترین نهاده‌ها، سموم و ماشین‌آلات کشاورزی می‌باشد. تضمین اصالت و بهترین قیمت، تعهد ما به کشاورزان زحمت‌کش ایرانی است." }}
                 </p>
+                <div style="display: flex; gap: 16px;">
+                    <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-site); display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <img src="{% static 'images/icons/phone.svg' %}" style="width: 20px; filter: brightness(0) invert(0.3);">
+                    </a>
+                    <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-site); display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <img src="{% static 'images/icons/location.svg' %}" style="width: 20px; filter: brightness(0) invert(0.3);">
+                    </a>
+                </div>
             </div>
+
+            <!-- نقشه سایت و دسترسی سریع -->
+            <div>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 24px; position: relative; padding-right: 12px;">
+                    نقشه سایت
+                    <span style="position: absolute; right: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); border-radius: 4px;"></span>
+                </h3>
+                <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 16px;">
+                    <li><a href="/" style="color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">صفحه اصلی</a></li>
+                    <li><a href="{% url 'product-list' %}" style="color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">فروشگاه نهاده‌ها</a></li>
+                    <li><a href="{% url 'articles_list' %}" style="color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">مجله آموزشی گیاه‌پزشکی</a></li>
+                    <li><a href="/contact-us" style="color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">تماس با ما</a></li>
+                    <li><a href="/about-us" style="color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">درباره آگروپارس</a></li>
+                </ul>
+            </div>
+
+            <!-- لینک‌های پویا دیتابیس -->
+            {% for footer_link_box in footer_link_boxes %}
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 24px; position: relative; padding-right: 12px;">
+                        {{ footer_link_box.title }}
+                        <span style="position: absolute; right: 0; top: 0; bottom: 0; width: 4px; background: var(--secondary); border-radius: 4px;"></span>
+                    </h3>
+                    <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 16px;">
+                        {% for link in footer_link_box.footerlink_set.all %}
+                            <li><a href="{{ link.url }}" style="color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--secondary)'" onmouseout="this.style.color='var(--text-muted)'">{{ link.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+
+            <!-- اطلاعات تماس -->
+            <div>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 24px; position: relative; padding-right: 12px;">
+                    ارتباط با ما
+                    <span style="position: absolute; right: 0; top: 0; bottom: 0; width: 4px; background: var(--text-dark); border-radius: 4px;"></span>
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 16px; color: var(--text-muted); font-size: 14px; font-weight: 600;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img src="{% static 'images/icons/phone.svg' %}" style="width: 18px; opacity: 0.6;">
+                        <span style="direction: ltr; text-align: right;">0993 224 8464</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <img src="{% static 'images/icons/location.svg' %}" style="width: 18px; opacity: 0.6; margin-top: 4px;">
+                        <span style="line-height: 1.6;">{{ site_setting.address|default:"تهران، خیابان کشاورز، پلاک ۱۲" }}</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-</footer><!--/Footer-->
+    <!-- کپی‌رایت -->
+    <div style="background-color: var(--bg-site); border-top: 1px solid var(--border); padding: 24px 0;">
+        <div class="container" style="display: flex; flex-direction: column; md:flex-row; justify-content: space-between; align-items: center; gap: 16px; text-align: center;">
+            <p style="color: var(--text-muted); font-size: 13px; font-weight: 600; margin: 0;">
+                {{ site_setting.copy_right|default:"کلیه حقوق این سایت متعلق به آگروپارس می‌باشد." }}
+            </p>
+            <div style="display: flex; gap: 16px;">
+                <img src="/static/images/home/map.png" alt="نماد اعتماد" style="height: 40px; filter: grayscale(1); opacity: 0.5;">
+            </div>
+        </div>
+    </div>
+</footer>

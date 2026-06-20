@@ -15,18 +15,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
     path('', include('home_module.urls')),
-    path('', include('account_module.urls')),
+    path("ckeditor5/", include('django_ckeditor_5.urls')),
+
     path('articles/', include('article_module.urls')),
     path('contact-us/', include('contact_module.urls')),
     path('products/', include('product_module.urls')),
     path('user/', include('user_panel_module.urls')),
+    path('admin-panel/', include('admin_panel_module.urls')),
     path('order/', include('order_module.urls')),
+    path('auth/', include('otp_auth.urls')),
     path('admin/', admin.site.urls),
+    path('sw.js', TemplateView.as_view(template_name='sw.js', content_type='application/javascript'), name='sw.js'),
 ]
 
-urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -43,19 +43,31 @@ function showLargeImage(imageSrc) {
     $('#show_large_image_modal').attr('href', imageSrc);
 }
 
-function addProductToOrder(productId) {
-    const productCount = $('#product-count').val();
-    $.get('/order/add-to-order?product_id=' + productId + '&count=' + productCount).then(res => {
+function addProductToOrder(productId, count = null) {
+    let productCount = count;
+    if (count === null) {
+        // Fallback for older inputs if quantity is not passed directly
+        productCount = $('#product-count').val() || 1;
+    }
+    
+    $.get('/order/add-to-cart/?product_id=' + productId + '&count=' + productCount).then(res => {
         Swal.fire({
             title: 'اعلان',
             text: res.text,
             icon: res.icon,
             showCancelButton: false,
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#047857',
             confirmButtonText: res.confirm_button_text
         }).then((result) => {
             if (result.isConfirmed && res.status === 'not_auth') {
-                window.location.href = '/login';
+                sessionStorage.setItem('pending_cart_product_id', productId);
+                sessionStorage.setItem('pending_cart_count', productCount);
+                window.location.href = '/auth/';
+            } else if (res.status === 'success') {
+                // Update cart count dynamically if possible
+                let currentCount = parseInt($('#cart-count-badge').text()) || 0;
+                // A simple page reload to update header is easiest for now
+                window.location.reload();
             }
         });
     });
@@ -79,3 +91,15 @@ function changeOrderDetailCount(detailId, state) {
         }
     });
 }
+
+$(document).ready(function() {
+    if (window.isUserAuthenticated) {
+        let pendingProductId = sessionStorage.getItem('pending_cart_product_id');
+        let pendingCount = sessionStorage.getItem('pending_cart_count');
+        if (pendingProductId) {
+            sessionStorage.removeItem('pending_cart_product_id');
+            sessionStorage.removeItem('pending_cart_count');
+            addProductToOrder(pendingProductId, pendingCount);
+        }
+    }
+});

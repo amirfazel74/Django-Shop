@@ -1,0 +1,60 @@
+{% load static %}
+
+<article class="article-card-modern" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; height: 100%; position: relative;"
+         onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)'; this.querySelector('.article-image').style.transform='scale(1.05)';"
+         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)'; this.querySelector('.article-image').style.transform='scale(1)';">
+    
+    <a href="{% url 'articles_detail' article.id %}" style="display: block; overflow: hidden; aspect-ratio: 16/10; position: relative; background: var(--bg-site);">
+        {% if article.image %}
+            <img src="{{ article.image.url }}" alt="{{ article.title }}" class="article-image" loading="lazy"
+                 style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;">
+        {% else %}
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                <img src="{% static 'images/icons/image-placeholder.svg' %}" style="width: 64px; opacity: 0.2;">
+            </div>
+        {% endif %}
+        
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%); pointer-events: none;"></div>
+        
+        {% with main_cat=article.selected_categories.first %}
+            {% if main_cat %}
+                <span style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9); color: var(--primary); padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 800; backdrop-filter: blur(4px); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    {{ main_cat.title }}
+                </span>
+            {% endif %}
+        {% endwith %}
+    </a>
+
+    <div style="padding: 24px; display: flex; flex-direction: column; flex-grow: 1;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 12px; color: var(--text-muted); font-weight: 500;">
+            <span style="display: flex; align-items: center; gap: 4px;">
+                <img src="{% static 'images/icons/calendar.svg' %}" style="width: 14px; opacity: 0.7;">
+                {{ article.get_jalali_create_date }}
+            </span>
+            <span style="display: flex; align-items: center; gap: 4px;">
+                <img src="{% static 'images/icons/user.svg' %}" style="width: 14px; opacity: 0.7;">
+                {{ article.author.get_full_name|default:article.author.username }}
+            </span>
+        </div>
+
+        <a href="{% url 'articles_detail' article.id %}" style="text-decoration: none;">
+            <h3 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ article.title }}
+            </h3>
+        </a>
+
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.8; margin-bottom: 24px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ article.short_description }}
+        </p>
+
+        <div style="margin-top: auto;">
+            <a href="{% url 'articles_detail' article.id %}" 
+               style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--primary); text-decoration: none; font-size: 14px; transition: gap 0.2s;"
+               onmouseover="this.style.gap='12px'"
+               onmouseout="this.style.gap='8px'">
+                مطالعه مقاله
+                <img src="{% static 'images/icons/chevron-left.svg' %}" style="width: 16px; filter: invert(41%) sepia(87%) saturate(1478%) hue-rotate(130deg) brightness(96%) contrast(98%);">
+            </a>
+        </div>
+    </div>
+</article>

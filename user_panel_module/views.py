@@ -1,5 +1,6 @@
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views import View
@@ -12,6 +13,42 @@ from django.contrib.auth import logout
 
 class UserPanelDashboardPage(TemplateView):
     template_name = 'user_panel_module/user_panel_dashboard_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from order_module.models import Order
+        
+        # Get user's orders (excluding cart)
+        orders = Order.objects.filter(user_id=self.request.user.id, is_paid=True).order_by('-payment_date')
+        
+        context['pending_orders_count'] = orders.filter(status='pending').count()
+        context['processing_orders_count'] = orders.filter(status='processing').count()
+        context['shipped_orders_count'] = orders.filter(status='shipped').count()
+        context['delivered_orders_count'] = orders.filter(status='delivered').count()
+        
+        # Total active orders (processing + shipped)
+        context['active_orders_count'] = context['processing_orders_count'] + context['shipped_orders_count']
+        
+        context['recent_orders'] = orders[:5]
+        
+        return context
+
+
+class UserPanelOrdersPage(TemplateView):
+    template_name = 'user_panel_module/user_orders_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from order_module.models import Order
+        
+        # Get user's orders (excluding cart)
+        orders = Order.objects.filter(user_id=self.request.user.id, is_paid=True).order_by('-payment_date')
+        
+        context['active_orders'] = orders.filter(status__in=['pending', 'processing', 'shipped'])
+        context['delivered_orders'] = orders.filter(status='delivered')
+        context['canceled_orders'] = orders.filter(status='canceled')
+        
+        return context
 
 
 class EditUserProfilePage(View):
@@ -66,6 +103,7 @@ def user_panel_menu_component(request: HttpRequest):
     return render(request, 'user_panel_module/components/user_panel_menu_component.html')
 
 
+@login_required
 def user_basket(request: HttpRequest):
     current_order, created = Order.objects.prefetch_related('orderdetail_set').get_or_create(is_paid=False, user_id=request.user.id)
     total_amount = current_order.calculate_total_price()

@@ -1,91 +1,324 @@
-{% extends 'shared/_layout.html' %}
-{% load thumbnail %}
-{% load render_partial %}
+{% extends 'shared/base.html' %}
+{% load static %}
 
-{% block title %}لیست محصولات{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/products.css' %}">
+{% endblock %}
 
 {% block content %}
-    <section>
-        <div class="container">
-            <div class="row">
+    <div class="container" style="padding-bottom: 80px;"
+         x-data="{ ...shopFilterController(), mobileFiltersOpen: false }">
 
-                <div class="col-sm-9 padding-right">
-                    {% if products %}
-                        <div class="features_items"><!--features_items-->
-                            <h2 class="title text-center">محصولات</h2>
-                            {% for product in products %}
-                                {% include 'includes/product_item_partial.html' with product=product col_size=4 %}
-                            {% endfor %}
-                            <div class="clearfix"></div>
-                            <ul class="pagination">
-                                {% if page_obj.has_previous %}
-                                    <li><a class="cursor-pointer"
-                                           onclick="fillPage({{ page_obj.previous_page_number }})">قبلی</a></li>
-                                {% endif %}
-                                {% for pageNumber in paginator.page_range %}
-                                    <li class="{% if page_obj.number == pageNumber %} active {% endif %}">
-                                        <a class="cursor-pointer"
-                                           onclick="fillPage({{ pageNumber }})">{{ pageNumber }}</a>
-                                    </li>
-                                {% endfor %}
-                                {% if page_obj.has_next %}
-                                    <li><a class="cursor-pointer" onclick="fillPage({{ page_obj.next_page_number }})">بعدی</a>
-                                    </li>
-                                {% endif %}
+        <nav aria-label="breadcrumb" style="margin-top: 24px;">
+            <ol class="breadcrumb-list" style="margin-bottom: 0;">
+                <li><a href="/" class="breadcrumb-link">فروشگاه</a></li>
+                <li class="breadcrumb-separator"><img src="{% static 'images/icons/chevron-left.svg' %}"
+                                                      style="width:12px; opacity:0.4;"></li>
+                <li><span class="breadcrumb-page">آرشیو محصولات</span></li>
+            </ol>
+        </nav>
 
-                            </ul>
-                        </div><!--features_items-->
-                    {% else %}
-                        <div class="alert alert-warning">
-                            <p>هیچ محصولی یافت نشد</p>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="col-sm-3">
-                    <div class="left-sidebar">
-                        {% render_partial 'product_module.views.product_categories_component' %}
-                        {% render_partial 'product_module.views.product_brands_component' %}
-
-
-                        <div class="price-range"><!--price-range-->
-                            <h2>فیلتـر قیمـت</h2>
-                            <div class="well">
-                                <input
-                                        type="text"
-                                        class="span2"
-                                        value="{{ start_price }},{{ end_price }}"
-                                        data-slider-min="0"
-                                        data-slider-max="{{ db_max_price }}"
-                                        data-slider-step="1000"
-                                        data-slider-value="[{{ start_price }},{{ end_price }}]"
-                                        id="sl2">
-                                <br/>
-                                <b>{{ db_max_price }}</b> <b class="pull-left">0</b>
-                            </div>
-                        </div><!--/price-range-->
-                        <div>
-                            <form action="" method="get" id="filter_form">
-                                <input type="hidden" name="page" id="page" value="{{ page_obj.number }}">
-                                <input type="hidden" name="start_price" id="start_price" value="{{ start_price }}">
-                                <input type="hidden" name="end_price" id="end_price" value="{{ end_price }}">
-                            </form>
-                            <button class="btn btn-success btn-block" onclick="filterProducts()">فیلتر</button>
-                        </div>
-                        <div class="shipping text-center"><!--shipping-->
-                            {% for banner in banners %}
-                                <a href="{{ banner.url }}">
-                                    <img src="{{ banner.image.url }}" alt="">
-                                </a>
-                            {% endfor %}
-                            <br>
-                            <br>
-                        </div><!--/shipping-->
-
-                    </div>
-                </div>
-
+        <div class="category-banner">
+            <div class="banner-content">
+                <span style="background: rgba(255,255,255,0.2); padding: 4px 16px; border-radius: 50px; font-size: 13px; font-weight: 700; margin-bottom: 16px; display: inline-block;">
+                    {{ page_obj.paginator.count|default:0 }} محصول یافت شد
+                </span>
+                <h1 class="banner-title">انواع نهاده‌ها و تجهیزات کشاورزی</h1>
+                <p class="banner-desc">تامین انواع سموم مجاز از معتبرترین برندهای داخلی و خارجی. فروش خرد و عمده با
+                    ضمانت اصالت کالا.</p>
+            </div>
+            <div class="banner-icon-bg desktop-only">
+                <img src="{% static 'images/icons/bug.svg' %}" style="width: 80px; filter: invert(1); opacity: 0.8;">
             </div>
         </div>
-    </section>
+
+        <div class="shop-layout">
+
+            <div class="filter-overlay" :class="{ 'open': mobileFiltersOpen }" @click="mobileFiltersOpen = false"></div>
+
+            <aside class="filter-sidebar" :class="{ 'open': mobileFiltersOpen }">
+                <form method="GET" action="{% url 'product-list' %}" id="mainFilterForm" x-ref="filterForm">
+
+                    <input type="hidden" name="sort" x-model="sortBy">
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-dark); margin: 0;">فیلترها</h3>
+                        <button type="button" class="mobile-only" @click="mobileFiltersOpen = false"
+                                style="background: none; border: none; font-size: 24px; line-height: 1; font-weight: bold; color: var(--text-muted); cursor: pointer;">
+                            ×
+                        </button>
+
+                        {% if request.GET %}
+                            <a href="{% url 'product-list' %}" class="desktop-only"
+                               style="color: var(--color-danger); font-size: 12px; font-weight: 700; text-decoration: none; padding: 4px 8px; background: #fef2f2; border-radius: 4px;">حذف
+                                همه ×</a>
+                        {% endif %}
+                    </div>
+
+                    <div class="filter-group" x-data="{ open: true }">
+                        <div class="filter-title" @click="open = !open">
+                            دسته‌بندی‌ها
+                            <img src="{% static 'images/icons/chevron-left.svg' %}"
+                                 style="width: 16px; transition: transform 0.3s;"
+                                 :style="open ? 'transform: rotate(-90deg)' : ''">
+                        </div>
+                        <div x-show="open" x-collapse>
+                            {% for cat in categories %}
+                                <label class="custom-checkbox-row">
+                                    <input type="checkbox" name="category" value="{{ cat.url_title }}"
+                                           style="display: none;" @change="submitForm"
+                                           {% if cat.url_title in selected_categories %}checked{% endif %}>
+                                    <div class="custom-checkbox"></div>
+                                    <span style="font-size: 13px; color: var(--text-dark); font-weight: 500;">{{ cat.title }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="filter-group" x-data="{ open: true }">
+                        <div class="filter-title" @click="open = !open">
+                            برندها
+                            <img src="{% static 'images/icons/chevron-left.svg' %}"
+                                 style="width: 16px; transition: transform 0.3s;"
+                                 :style="open ? 'transform: rotate(-90deg)' : ''">
+                        </div>
+                        <div x-show="open" x-collapse>
+                            <div class="hide-scrollbar" style="max-height: 180px; overflow-y: auto;">
+                                {% for brand in brands %}
+                                    <label class="custom-checkbox-row">
+                                        <input type="checkbox" name="brand" value="{{ brand.url_title }}"
+                                               style="display: none;" @change="submitForm"
+                                               {% if brand.url_title in selected_brands %}checked{% endif %}>
+                                        <div class="custom-checkbox"></div>
+                                        <span style="font-size: 13px; color: var(--text-dark); font-weight: 500;">{{ brand.title }}</span>
+                                        <span style="font-size: 11px; color: var(--text-muted); margin-right: auto; background: var(--bg-site); padding: 2px 6px; border-radius: 4px;">{{ brand.products_count }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group" x-data="{ open: true }">
+                        <div class="filter-title" @click="open = !open">
+                            کلاس خطر سموم
+                            <img src="{% static 'images/icons/chevron-left.svg' %}"
+                                 style="width: 16px; transition: transform 0.3s;"
+                                 :style="open ? 'transform: rotate(-90deg)' : ''">
+                        </div>
+                        <div x-show="open" x-collapse>
+                            <label class="custom-checkbox-row">
+                                <input type="checkbox" name="hazard" value="red" style="display: none;"
+                                       @change="submitForm" {% if 'red' in selected_hazards %}checked{% endif %}>
+                                <div class="custom-checkbox"></div>
+                                <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dark);">
+                                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #dc2626;"></span> بسیار خطرناک
+                                </span>
+                            </label>
+                            <label class="custom-checkbox-row">
+                                <input type="checkbox" name="hazard" value="yellow" style="display: none;"
+                                       @change="submitForm" {% if 'yellow' in selected_hazards %}checked{% endif %}>
+                                <div class="custom-checkbox"></div>
+                                <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dark);">
+                                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span> خطرناک
+                                </span>
+                            </label>
+                            <label class="custom-checkbox-row">
+                                <input type="checkbox" name="hazard" value="green" style="display: none;"
+                                       @change="submitForm" {% if 'green' in selected_hazards %}checked{% endif %}>
+                                <div class="custom-checkbox"></div>
+                                <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dark);">
+                                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span> کم خطر / ارگانیک
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group" x-data="{ open: true }">
+                        <div class="filter-title" @click="open = !open">
+                            محدوده قیمت
+                            <img src="{% static 'images/icons/chevron-left.svg' %}"
+                                 style="width: 16px; transition: transform 0.3s;"
+                                 :style="open ? 'transform: rotate(-90deg)' : ''">
+                        </div>
+                        <div x-show="open" x-collapse>
+
+                            <input type="hidden" name="start_price" :value="rawPriceMin">
+                            <input type="hidden" name="end_price" :value="rawPriceMax">
+
+                            <div style="margin-bottom: 16px; margin-top: 12px; width: 100%;">
+                                <input type="range" min="0" max="{{ db_max_price|default:20000000 }}" step="50000"
+                                       x-model="rawPriceMax"
+                                       style="width: 100%; accent-color: var(--primary); cursor: pointer;">
+                                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-muted); font-weight: 700;">
+                                    <span x-text="formatPrice(rawPriceMin) + ' تومان'"></span>
+                                    <span x-text="formatPrice(rawPriceMax) + ' تومان'"></span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 8px; margin-bottom: 16px; width: 100%;">
+                                <div style="flex: 1; min-width: 0;">
+                                    <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">از
+                                        (تومان)</label>
+                                    <input type="text" class="price-input" :value="formatPrice(rawPriceMin)"
+                                           @input="rawPriceMin = parsePrice($event.target.value)"
+                                           @change="rawPriceMin = parsePrice($event.target.value)"
+                                           style="width: 100%; box-sizing: border-box; min-width: 0;">
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">تا
+                                        (تومان)</label>
+                                    <input type="text" class="price-input" :value="formatPrice(rawPriceMax)"
+                                           @input="rawPriceMax = parsePrice($event.target.value)"
+                                           @change="rawPriceMax = parsePrice($event.target.value)"
+                                           style="width: 100%; box-sizing: border-box; min-width: 0;">
+                                </div>
+                            </div>
+
+                            <button type="button" @click="submitForm" class="btn btn-outline"
+                                    style="width: 100%; padding: 8px; font-size: 13px; color: var(--primary); border-color: var(--primary); border-radius: var(--radius-md); font-weight: 800;">
+                                اعمال رنج قیمت
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" @click="submitForm" class="btn btn-primary mobile-only"
+                            style="width: 100%; margin-top: 24px;">مشاهده محصولات
+                    </button>
+
+                    {% if request.GET %}
+                        <a href="{% url 'product-list' %}" class="btn btn-outline mobile-only"
+                           style="width: 100%; margin-top: 8px; border-color: var(--color-danger); color: var(--color-danger);">حذف
+                            همه فیلترها</a>
+                    {% endif %}
+
+                </form>
+            </aside>
+
+            <main>
+                <div class="sort-bar">
+                    <div style="display: flex; align-items: center; gap: 6px; color: var(--text-dark); font-weight: 800; font-size: 14px;">
+                        <img src="{% static 'images/icons/filter.svg' %}" style="width: 20px;">
+                        <span class="desktop-only">مرتب‌سازی:</span>
+                    </div>
+
+                    <div class="desktop-sort-buttons">
+                        <button class="sort-btn" :class="{ 'active': sortBy === 'newest' }"
+                                @click="changeSort('newest')">جدیدترین
+                        </button>
+                        <button class="sort-btn" :class="{ 'active': sortBy === 'bestseller' }"
+                                @click="changeSort('bestseller')">پرفروش‌ترین
+                        </button>
+                        <button class="sort-btn" :class="{ 'active': sortBy === 'cheap' }" @click="changeSort('cheap')">
+                            ارزان‌ترین
+                        </button>
+                        <button class="sort-btn" :class="{ 'active': sortBy === 'expensive' }"
+                                @click="changeSort('expensive')">گران‌ترین
+                        </button>
+                    </div>
+
+                    <select x-model="sortBy" @change="submitForm" class="mobile-sort-select">
+                        <option value="newest">جدیدترین</option>
+                        <option value="bestseller">پرفروش‌ترین</option>
+                        <option value="cheap">ارزان‌ترین</option>
+                        <option value="expensive">گران‌ترین</option>
+                    </select>
+                </div>
+
+                <div class="product-grid">
+                    {% for product in products %}
+                        {% include 'home_module/partials/product_card.html' with product=product %}
+                    {% empty %}
+                        <div style="grid-column: 1 / -1; padding: 64px; text-align: center; background: white; border-radius: var(--radius-lg); border: 1px dashed var(--border);">
+                            <img src="{% static 'images/icons/search.svg' %}"
+                                 style="width: 64px; opacity: 0.2; margin-bottom: 16px;">
+                            <p style="color: var(--text-dark); font-size: 18px; font-weight: 800;">نتیجه‌ای یافت
+                                نشد!</p>
+                            <p style="color: var(--text-muted); font-size: 14px;">محصولی با فیلترهای انتخاب شده وجود
+                                ندارد.</p>
+                            <a href="{% url 'product-list' %}" class="btn btn-primary" style="margin-top: 16px;">حذف
+                                فیلترها</a>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                    <div style="display: flex; justify-content: center; gap: 8px; margin-top: 48px;">
+                        {% if page_obj.has_previous %}
+                            <a href="?
+                                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}"
+                               class="btn btn-outline" style="padding: 8px 16px;">قبلی</a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            <a href="?
+                                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}"
+                               style="padding: 8px 16px; border: 1px solid {% if page_obj.number == num %}var(--primary){% else %}var(--border){% endif %}; border-radius: var(--radius-md); background: {% if page_obj.number == num %}var(--primary){% else %}white{% endif %}; color: {% if page_obj.number == num %}white{% else %}var(--text-dark){% endif %}; text-decoration: none; font-size: 14px; font-weight: 700;">
+                                {{ num }}
+                            </a>
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?
+                                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
+                               class="btn btn-outline" style="padding: 8px 16px;">بعدی</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+            </main>
+        </div>
+
+        <button class="mobile-filter-btn" @click="mobileFiltersOpen = true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            فیلتر محصولات
+        </button>
+
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('shopFilterController', () => ({
+                sortBy: '{{ request.GET.sort|default:"newest" }}',
+                rawPriceMin: parseInt('{{ request.GET.start_price|default:0 }}') || 0,
+                rawPriceMax: parseInt('{{ request.GET.end_price|default:db_max_price|default:20000000 }}') || 20000000,
+
+                submitForm() {
+                    if (this.rawPriceMin > this.rawPriceMax) {
+                        let temp = this.rawPriceMin;
+                        this.rawPriceMin = this.rawPriceMax;
+                        this.rawPriceMax = temp;
+                    }
+                    this.$nextTick(() => {
+                        this.$refs.filterForm.submit();
+                    });
+                },
+
+                changeSort(val) {
+                    this.sortBy = val;
+                    this.submitForm();
+                },
+
+                formatPrice(value) {
+                    if (value === null || value === undefined || isNaN(value)) return '۰';
+                    return new Intl.NumberFormat('fa-IR').format(value);
+                },
+
+                parsePrice(formatted) {
+                    if (!formatted) return 0;
+                    const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+                    let english = String(formatted);
+                    persian.forEach((p, i) => {
+                        english = english.split(p).join(i);
+                    });
+                    let parsed = parseInt(english.replace(/[,،\s]/g, ''));
+                    return isNaN(parsed) ? 0 : parsed;
+                }
+            }));
+        });
+    </script>
 {% endblock %}

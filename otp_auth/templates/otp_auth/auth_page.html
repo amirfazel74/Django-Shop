@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود / ثبت‌نام | اگری‌تک</title>
+
+    <!-- فونت وزیرمتن -->
+    <link href="/static/css/Vazirmatn-font-face.css" rel="stylesheet">
+
+    <!-- CSS Core (متغیرها و استایل‌های پایه) -->
+    <link rel="stylesheet" href="/static/css/core.css">
+
+    <style>
+        body {
+            background-color: #f1f5f9;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .auth-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), #34d399);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-logo {
+            width: 64px;
+            height: 64px;
+            background: #ecfdf5;
+            color: var(--primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+            transform: rotate(-5deg);
+        }
+
+        .auth-logo svg {
+            width: 32px;
+            height: 32px;
+            transform: rotate(5deg);
+        }
+
+        .auth-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .auth-input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #334155;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .auth-input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .otp-input {
+            text-align: center;
+            letter-spacing: 12px;
+            font-size: 24px;
+            font-weight: 800;
+            padding-left: 16px; /* Reset padding for center */
+            color: var(--primary);
+        }
+
+        .auth-submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .auth-submit-btn:hover {
+            filter: brightness(1.05);
+            transform: translateY(-2px);
+        }
+
+        .auth-submit-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .auth-secondary-btn {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: var(--text-dark);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+
+        .auth-secondary-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .auth-link-btn {
+            width: 100%;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .auth-link-btn:hover {
+            opacity: 1;
+        }
+
+        .auth-timer {
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            margin: 16px 0;
+            font-weight: 600;
+        }
+
+        .auth-timer span {
+            color: var(--color-danger);
+            font-weight: 800;
+            margin-right: 4px;
+        }
+
+        .auth-message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .auth-message.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .auth-message.success {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #6ee7b7;
+        }
+
+        .auth-message.info {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #93c5fd;
+        }
+
+        .auth-footer {
+            margin-top: 32px;
+            text-align: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 24px;
+        }
+
+        .auth-footer-text {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .auth-footer-text a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+
+    <!-- Alpine.js -->
+    <script defer src="/static/js/vendors/alpine.min.js"></script>
+</head>
+<body>
+
+<div class="auth-page-wrapper" x-data="authController()">
+    {% csrf_token %}
+
+    <div class="auth-card">
+
+        <!-- هدر کارت -->
+        <div class="auth-header">
+            <div class="auth-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                     stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+            </div>
+            <h1 class="auth-title" x-text="stepTitles[currentStep]"></h1>
+            <p class="auth-subtitle" x-text="stepSubtitles[currentStep]"></p>
+        </div>
+
+        <!-- پیام‌ها -->
+        <template x-if="message">
+            <div class="auth-message" :class="messageType">
+                <span x-text="message"></span>
+            </div>
+        </template>
+
+        <!-- ==========================================
+             مرحله ۱: دریافت شماره موبایل
+             ========================================== -->
+        <template x-if="currentStep === 'phone'">
+            <div class="auth-step">
+                <form class="auth-form" @submit.prevent="submitPhone">
+                    <div class="auth-input-group">
+                        <input
+                                type="tel"
+                                x-model="mobile"
+                                class="auth-input"
+                                placeholder="شماره موبایل (0912...)"
+                                maxlength="11"
+                                pattern="09[0-9]{9}"
+                                required
+                                autofocus
+                        >
+                        <svg class="auth-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/>
+                        </svg>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn" :disabled="isLoading">
+                        <template x-if="!isLoading">
+                            <span>ارسال کد تایید</span>
+                        </template>
+                        <template x-if="isLoading">
+                            <span>در حال ارسال...</span>
+                        </template>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p class="auth-footer-text">
+                        با ورود به سایت، <a href="#">قوانین و مقررات</a> اگری‌تک را می‌پذیرید.
+                    </p>
+                </div>
+            </div>
+        </template>
+
+        <!-- ==========================================
+             مرحله ۲: وارد کردن کد OTP
+             ========================================== -->
+        <template x-if="currentStep === 'otp'">
+            <div class="auth-step">
+                <form class="auth-form" @submit.prevent="submitOtp">
+                    <div class="auth-input-group">
+                        <input
+                                type="text"
+                                x-model="otpCode"
+                                class="auth-input otp-input"
+                                placeholder="- - - - -"
+                                maxlength="5"
+                                pattern="[0-9]{5}"
+                                inputmode="numeric"
+                                required
+                                autofocus
+                        >
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn" :disabled="isLoading">
+                        <template x-if="!isLoading">
+                            <span>تایید و ورود</span>
+                        </template>
+                        <template x-if="isLoading">
+                            <span>در حال بررسی...</span>
+                        </template>
+                    </button>
+
+                    <!-- تایمر و ارسال مجدد -->
+                    <div class="auth-timer" x-show="cooldown > 0">
+                        ارسال مجدد کد تا <span x-text="formatCooldown(cooldown)"></span>
+                    </div>
+
+                    <button
+                            type="button"
+                            class="auth-secondary-btn"
+                            x-show="cooldown === 0"
+                            @click="resendOtp"
+                            :disabled="isLoading"
+                    >
+                        ارسال مجدد کد
+                    </button>
+
+                    <button
+                            type="button"
+                            class="auth-link-btn"
+                            @click="currentStep = 'phone'; message = ''"
+                    >
+                        تغییر شماره موبایل
+                    </button>
+                </form>
+            </div>
+        </template>
+
+        <!-- ==========================================
+             مرحله ۳: وارد کردن رمز عبور (کاربران قدیمی)
+             ========================================== -->
+        <template x-if="currentStep === 'password'">
+            <div class="auth-step">
+                <form class="auth-form" @submit.prevent="submitPassword">
+                    <div class="auth-input-group">
+                        <input
+                                type="password"
+                                x-model="password"
+                                class="auth-input"
+                                placeholder="رمز عبور"
+                                required
+                                autofocus
+                        >
+                        <svg class="auth-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                        </svg>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn" :disabled="isLoading">
+                        <template x-if="!isLoading">
+                            <span>ورود به حساب</span>
+                        </template>
+                        <template x-if="isLoading">
+                            <span>در حال ورود...</span>
+                        </template>
+                    </button>
+
+                    <button
+                            type="button"
+                            class="auth-secondary-btn"
+                            @click="forceOtp"
+                    >
+                        رمز عبور را فراموش کرده‌ام (ورود پیامکی)
+                    </button>
+
+                    <button
+                            type="button"
+                            class="auth-link-btn"
+                            @click="currentStep = 'phone'; message = ''"
+                    >
+                        تغییر شماره موبایل
+                    </button>
+                </form>
+            </div>
+        </template>
+
+        <!-- ==========================================
+             مرحله ۴: تکمیل پروفایل (کاربران جدید)
+             ========================================== -->
+        <template x-if="currentStep === 'profile'">
+            <div class="auth-step">
+                <form class="auth-form" @submit.prevent="submitProfile">
+                    <div class="auth-input-group">
+                        <input
+                                type="text"
+                                x-model="firstName"
+                                class="auth-input"
+                                placeholder="نام"
+                                required
+                        >
+                        <svg class="auth-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                        </svg>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <input
+                                type="text"
+                                x-model="lastName"
+                                class="auth-input"
+                                placeholder="نام خانوادگی"
+                                required
+                        >
+                    </div>
+
+                    <div class="auth-input-group">
+                        <input
+                                type="password"
+                                x-model="password"
+                                class="auth-input"
+                                placeholder="رمز عبور (حداقل ۶ کاراکتر)"
+                                minlength="6"
+                                required
+                        >
+                        <svg class="auth-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                        </svg>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <input
+                                type="password"
+                                x-model="passwordConfirm"
+                                class="auth-input"
+                                placeholder="تکرار رمز عبور"
+                                minlength="6"
+                                required
+                        >
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn" :disabled="isLoading">
+                        <template x-if="!isLoading">
+                            <span>ثبت‌نام و ورود</span>
+                        </template>
+                        <template x-if="isLoading">
+                            <span>در حال ثبت‌نام...</span>
+                        </template>
+                    </button>
+                </form>
+            </div>
+        </template>
+
+    </div>
+</div>
+
+<script>
+    function authController() {
+        return {
+            // وضعیت فعلی: 'phone' | 'otp' | 'password' | 'profile'
+            currentStep: 'phone',
+
+            // داده‌های فرم
+            mobile: '',
+            otpCode: '',
+            password: '',
+            passwordConfirm: '',
+            firstName: '',
+            lastName: '',
+
+            // وضعیت UI
+            isLoading: false,
+            message: '',
+            messageType: 'info', // 'error' | 'success' | 'info'
+            cooldown: 0,
+
+            // عنوان‌های هر مرحله
+            stepTitles: {
+                'phone': 'ورود / ثبت‌نام',
+                'otp': 'کد تایید',
+                'password': 'ورود به حساب',
+                'profile': 'تکمیل پروفایل'
+            },
+
+            stepSubtitles: {
+                'phone': 'شماره موبایل خود را وارد کنید',
+                'otp': 'کد ۵ رقمی پیامک شده را وارد کنید',
+                'password': 'رمز عبور خود را وارد کنید',
+                'profile': 'اطلاعات خود را تکمیل کنید'
+            },
+
+            // ==========================================
+            // متدهای کمکی
+            // ==========================================
+
+            showMessage(text, type = 'info') {
+                this.message = text;
+                this.messageType = type;
+                setTimeout(() => {
+                    if (this.message === text) this.message = '';
+                }, 5000);
+            },
+
+            formatCooldown(seconds) {
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return `${m}:${s.toString().padStart(2, '0')}`;
+            },
+
+            startCooldown() {
+                this.cooldown = 120; // 2 دقیقه
+                const timer = setInterval(() => {
+                    this.cooldown--;
+                    if (this.cooldown <= 0) {
+                        clearInterval(timer);
+                    }
+                }, 1000);
+            },
+
+            // ==========================================
+            // ارسال شماره موبایل
+            // ==========================================
+            async submitPhone() {
+                if (!this.mobile || this.mobile.length !== 11) {
+                    this.showMessage('شماره موبایل باید ۱۱ رقم و با 09 شروع شود.', 'error');
+                    return;
+                }
+
+                this.isLoading = true;
+                this.message = '';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('mobile', this.mobile);
+                    formData.append('csrfmiddlewaretoken', this.getCookie('csrftoken'));
+
+                    const response = await fetch('/auth/request-otp/', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    });
+
+                    const html = await response.text();
+
+                    // بررسی پاسخ سرور
+                    if (html.includes('otp_form')) {
+                        this.currentStep = 'otp';
+                        this.showMessage('کد تایید با موفقیت ارسال شد.', 'success');
+                        this.startCooldown();
+                    } else if (html.includes('password_form')) {
+                        this.currentStep = 'password';
+                    } else if (html.includes('error-box')) {
+                        // استخراج پیام خطا از HTML
+                        const errorMatch = html.match(/error-box[^>]*>([^<]+)</);
+                        this.showMessage(errorMatch ? errorMatch[1].trim() : 'خطایی رخ داد.', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.', 'error');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ==========================================
+            // ارسال کد OTP
+            // ==========================================
+            async submitOtp() {
+                if (!this.otpCode || this.otpCode.length !== 5) {
+                    this.showMessage('کد تایید باید ۵ رقم باشد.', 'error');
+                    return;
+                }
+
+                this.isLoading = true;
+                this.message = '';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('otp_code', this.otpCode);
+                    formData.append('csrfmiddlewaretoken', this.getCookie('csrftoken'));
+
+                    const response = await fetch('/auth/verify-otp/', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    });
+
+                    const html = await response.text();
+
+                    // بررسی ریدایرکت
+                    const redirectUrl = response.headers.get('HX-Redirect');
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                        return;
+                    }
+
+                    if (html.includes('complete_profile_form')) {
+                        this.currentStep = 'profile';
+                        this.showMessage('شماره موبایل تایید شد. لطفاً پروفایل خود را تکمیل کنید.', 'success');
+                    } else if (html.includes('error-box')) {
+                        const errorMatch = html.match(/error-box[^>]*>([^<]+)</);
+                        this.showMessage(errorMatch ? errorMatch[1].trim() : 'کد اشتباه است.', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('خطا در ارتباط با سرور.', 'error');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ==========================================
+            // ارسال مجدد کد OTP
+            // ==========================================
+            async resendOtp() {
+                this.isLoading = true;
+                this.message = '';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('csrfmiddlewaretoken', this.getCookie('csrftoken'));
+
+                    const response = await fetch('/auth/force-otp/', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    });
+
+                    const html = await response.text();
+
+                    if (html.includes('otp_form')) {
+                        this.showMessage('کد جدید با موفقیت ارسال شد.', 'success');
+                        this.startCooldown();
+                    } else if (html.includes('error-box')) {
+                        const errorMatch = html.match(/error-box[^>]*>([^<]+)</);
+                        this.showMessage(errorMatch ? errorMatch[1].trim() : 'خطا در ارسال کد.', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('خطا در ارتباط با سرور.', 'error');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ==========================================
+            // ارسال رمز عبور (کاربران قدیمی)
+            // ==========================================
+            async submitPassword() {
+                if (!this.password) {
+                    this.showMessage('رمز عبور را وارد کنید.', 'error');
+                    return;
+                }
+
+                this.isLoading = true;
+                this.message = '';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('password', this.password);
+                    formData.append('csrfmiddlewaretoken', this.getCookie('csrftoken'));
+
+                    const response = await fetch('/auth/verify-password/', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    });
+
+                    const redirectUrl = response.headers.get('HX-Redirect');
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                        return;
+                    }
+
+                    const html = await response.text();
+                    if (html.includes('error-box')) {
+                        const errorMatch = html.match(/error-box[^>]*>([^<]+)</);
+                        this.showMessage(errorMatch ? errorMatch[1].trim() : 'رمز عبور اشتباه است.', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('خطا در ارتباط با سرور.', 'error');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ==========================================
+            // درخواست ورود پیامکی (فراموشی رمز)
+            // ==========================================
+            async forceOtp() {
+                this.isLoading = true;
+                this.message = '';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('csrfmiddlewaretoken', this.getCookie('csrftoken'));
+
+                    const response = await fetch('/auth/force-otp/', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    });
+
+                    const html = await response.text();
+
+                    if (html.includes('otp_form')) {
+                        this.currentStep = 'otp';
+                        this.showMessage('کد تایید با موفقیت ارسال شد.', 'success');
+                        this.startCooldown();
+                    } else if (html.includes('error-box')) {
+                        const errorMatch = html.match(/error-box[^>]*>([^<]+)</);
+                        this.showMessage(errorMatch ? errorMatch[1].trim() : 'خطا در ارسال کد.', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('خطا در ارتباط با سرور.', 'error');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ==========================================
+            // تکمیل پروفایل (کاربران جدید)
+            // ==========================================
+            async submitProfile() {
+                if (this.password !== this.passwordConfirm) {
+                    this.showMessage('رمز عبور و تکرار آن مطابقت ندارند.', 'error');
+                    return;
+                }
+
+                if (this.password.length < 6) {
+                    this.showMessage('رمز عبور باید حداقل ۶ کاراکتر باشد.', 'error');
+                    return;
+                }
+
+                this.isLoading = true;
+                this.message = '';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('first_name', this.firstName);
+                    formData.append('last_name', this.lastName);
+                    formData.append('password', this.password);
+                    formData.append('password_confirm', this.passwordConfirm);
+                    formData.append('csrfmiddlewaretoken', this.getCookie('csrftoken'));
+
+                    const response = await fetch('/auth/save-profile/', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    });
+
+                    const redirectUrl = response.headers.get('HX-Redirect');
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                        return;
+                    }
+
+                    const html = await response.text();
+                    if (html.includes('error-box')) {
+                        const errorMatch = html.match(/error-box[^>]*>([^<]+)</);
+                        this.showMessage(errorMatch ? errorMatch[1].trim() : 'خطا در ثبت‌نام.', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('خطا در ارتباط با سرور.', 'error');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ==========================================
+            // متد کمکی: دریافت CSRF Token
+            // ==========================================
+            getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

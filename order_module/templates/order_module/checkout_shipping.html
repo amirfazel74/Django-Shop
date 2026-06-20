@@ -1,0 +1,159 @@
+{% extends 'shared/base.html' %}
+{% load poll_extras %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block title %}
+اطلاعات ارسال
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container" style="margin-top: 40px; margin-bottom: 40px;">
+    <!-- Stepper -->
+    <div class="checkout-stepper">
+        <div class="step active completed">
+            <div class="step-circle"><i class="fa fa-check"></i></div>
+            <div class="step-label">سبد خرید</div>
+        </div>
+        <div class="step-line active"></div>
+        <div class="step active">
+            <div class="step-circle"><i class="fa fa-check"></i></div>
+            <div class="step-label">اطلاعات ارسال</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="step-circle">۳</div>
+            <div class="step-label">پرداخت</div>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'order_module:checkout_shipping' %}" class="checkout-grid">
+        {% csrf_token %}
+        <!-- Main Form Area -->
+        <div class="checkout-main">
+            <!-- Address Box -->
+            <div class="checkout-box">
+                <h3 class="box-title"><i class="fa fa-map-marker"></i> اطلاعات گیرنده و آدرس</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>نام گیرنده</label>
+                        <input type="text" name="first_name" class="modern-input" value="{{ user.first_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>نام خانوادگی گیرنده</label>
+                        <input type="text" name="last_name" class="modern-input" value="{{ user.last_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>شماره موبایل</label>
+                        <input type="tel" name="mobile" class="modern-input" value="{{ user.mobile }}" placeholder="09..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>کد پستی (۱۰ رقمی)</label>
+                        <input type="text" name="postal_code" class="modern-input" placeholder="۱۲۳۴۵۶۷۸۹۰">
+                    </div>
+                    <div class="form-group">
+                        <label>استان</label>
+                        <select name="province" class="modern-input" required>
+                            <option value="">انتخاب استان...</option>
+                            <option value="تهران">تهران</option>
+                            <option value="خراسان رضوی">خراسان رضوی</option>
+                            <option value="اصفهان">اصفهان</option>
+                            <option value="فارس">فارس</option>
+                            <!-- More options can be added dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>شهر</label>
+                        <input type="text" name="city" class="modern-input" required placeholder="نام شهر">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>آدرس دقیق</label>
+                        <textarea name="address" class="modern-input" rows="3" required placeholder="خیابان، کوچه، پلاک، زنگ...">{{ user.address }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Method Box -->
+            <div class="checkout-box mt-4">
+                <h3 class="box-title"><i class="fa fa-truck"></i> روش ارسال</h3>
+                
+                <div class="shipping-methods">
+                    <label class="shipping-option">
+                        <input type="radio" name="shipping_method" value="post" checked onchange="updateShippingCost(85000)">
+                        <div class="option-content">
+                            <div class="option-icon"><img src="/static/images/icons/box.svg" alt="پست" style="width: 24px;"></div>
+                            <div class="option-details">
+                                <span class="option-title">پست پیشتاز</span>
+                                <span class="option-desc">تحویل ۳ تا ۵ روز کاری</span>
+                            </div>
+                            <div class="option-price">۸۵,۰۰۰ تومان</div>
+                        </div>
+                    </label>
+
+                    <label class="shipping-option">
+                        <input type="radio" name="shipping_method" value="barbari" onchange="updateShippingCost(0)">
+                        <div class="option-content">
+                            <div class="option-icon"><img src="/static/images/icons/truck.svg" alt="باربری" style="width: 24px;"></div>
+                            <div class="option-details">
+                                <span class="option-title">ارسال با باربری (پس‌کرایه)</span>
+                                <span class="option-desc">مناسب کالاهای سنگین و حجیم - پرداخت هزینه هنگام تحویل</span>
+                            </div>
+                            <div class="option-price">پس‌کرایه</div>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="alert-box warning mt-3">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>توجه:</strong> در صورت انتخاب باربری، سفارش شما به نزدیک‌ترین ترمینال باربری شهر شما ارسال شده و هزینه آن در محل توسط شما پرداخت خواهد شد.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Sidebar -->
+        <div class="checkout-sidebar">
+            <div class="summary-box sticky-box">
+                <h3 class="summary-title">خلاصه سفارش</h3>
+                <div class="summary-row">
+                    <span>تعداد کالاها</span>
+                    <span>{{ order.orderdetail_set.count }} عدد</span>
+                </div>
+                <div class="summary-row">
+                    <span>مبلغ کالاها</span>
+                    <span id="items-price" data-price="{{ sum }}">{{ sum|three_digits_currency }} تومان</span>
+                </div>
+                <div class="summary-row">
+                    <span>هزینه ارسال</span>
+                    <span id="shipping-price-display">۸۵,۰۰۰ تومان</span>
+                </div>
+                <hr class="summary-divider">
+                <div class="summary-row total-row">
+                    <span>مبلغ قابل پرداخت</span>
+                    <span class="total-amount"><span id="final-price-display">{{ sum|add:85000|three_digits_currency }}</span> <small>تومان</small></span>
+                </div>
+                <button type="submit" class="btn-checkout-primary mt-3">ثبت اطلاعات و پرداخت</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function updateShippingCost(cost) {
+        const itemsPrice = parseInt(document.getElementById('items-price').getAttribute('data-price'));
+        const finalPrice = itemsPrice + cost;
+        
+        if (cost === 0) {
+            document.getElementById('shipping-price-display').innerHTML = '<span style="color: #d97706;">پس‌کرایه (پرداخت در محل)</span>';
+        } else {
+            document.getElementById('shipping-price-display').innerText = new Intl.NumberFormat('fa-IR').format(cost) + ' تومان';
+        }
+        
+        document.getElementById('final-price-display').innerText = new Intl.NumberFormat('fa-IR').format(finalPrice);
+    }
+</script>
+{% endblock %}
