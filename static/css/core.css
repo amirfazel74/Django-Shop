@@ -382,3 +382,27 @@ body {
 .mobile-nav-link:hover {
     color: var(--primary);
 }
+
+/* PWA Standalone Mode Adjustments */
+.pwa-back-button {
+    display: none !important;
+}
+
+@media (display-mode: standalone) {
+    .pwa-back-button {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-dark);
+        padding: 8px;
+        border-radius: 50%;
+        transition: background 0.2s;
+    }
+
+    .pwa-back-button:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+}

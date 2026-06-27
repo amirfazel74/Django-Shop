@@ -1,5 +1,6 @@
 import secrets
 import string
+from django.contrib.auth.hashers import check_password, identify_hasher, make_password
 from django.utils import timezone
 from datetime import timedelta
 import logging
@@ -98,13 +99,13 @@ class OTPAuthService:
 
         otp_record = OTPRequest.objects.create(
             phone_number=phone_number,
-            otp_code=otp_code,
+            otp_code=make_password(otp_code),
             purpose=purpose,
             ip_address=ip_address,
             user_agent=user_agent
         )
 
-        logger.info(f"OTP generated for {phone_number}: {otp_code} (Purpose: {purpose})")
+        logger.info(f"OTP generated for {phone_number} (Purpose: {purpose})")
 
         # ==========================================
         # ۴. ارتباط با ماژول SMS Manager برای ارسال پیامک
@@ -195,7 +196,14 @@ class OTPAuthService:
         # ==========================================
         # ۳. بررسی مطابقت کد وارد شده
         # ==========================================
-        if otp_record.otp_code != provided_code:
+        try:
+            identify_hasher(otp_record.otp_code)
+            is_code_valid = check_password(provided_code, otp_record.otp_code)
+        except ValueError:
+            # Backward compatibility for any OTP rows created before hashing was added.
+            is_code_valid = otp_record.otp_code == provided_code
+
+        if not is_code_valid:
             # افزایش تعداد تلاش‌های ناموفق
             otp_record.failed_attempts += 1
             otp_record.save()

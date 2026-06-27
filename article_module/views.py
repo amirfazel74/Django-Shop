@@ -1,5 +1,7 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.http import HttpRequest, HttpResponseBadRequest
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic.list import ListView
 from article_module.models import Article, ArticleCategory, ArticleComment
@@ -49,19 +51,30 @@ def article_categories_component(request: HttpRequest):
     return render(request, 'article_module/components/article_categories_component.html', context)
 
 
+@login_required
+@require_POST
 def add_article_comment(request: HttpRequest):
-    if request.user.is_authenticated:
-        article_id = request.GET.get('article_id')
-        article_comment = request.GET.get('article_comment')
-        parent_id = request.GET.get('parent_id')
-        print(article_id, article_comment, parent_id)
-        new_comment = ArticleComment(article_id=article_id, text=article_comment, user_id=request.user.id, parent_id=parent_id)
-        new_comment.save()
-        context = {
-            'comments': ArticleComment.objects.filter(article_id=article_id, parent=None).order_by('-create_date').prefetch_related('articlecomment_set'),
-            'comments_count': ArticleComment.objects.filter(article_id=article_id).count()
-        }
+    article_id = request.POST.get('article_id')
+    article_comment = (request.POST.get('article_comment') or '').strip()
+    parent_id = request.POST.get('parent_id') or None
 
-        return render(request, 'article_module/includes/article_comments_partial.html', context)
+    if not article_id or not article_comment:
+        return HttpResponseBadRequest('Invalid comment data')
 
-    return HttpResponse('response')
+    article = get_object_or_404(Article, id=article_id, is_active=True)
+    parent = None
+    if parent_id:
+        parent = get_object_or_404(ArticleComment, id=parent_id, article_id=article.id)
+
+    ArticleComment.objects.create(
+        article=article,
+        text=article_comment,
+        user_id=request.user.id,
+        parent=parent,
+    )
+
+    context = {
+        'comments': ArticleComment.objects.filter(article_id=article.id, parent=None).order_by('-create_date').prefetch_related('articlecomment_set'),
+        'comments_count': ArticleComment.objects.filter(article_id=article.id).count()
+    }
+    return render(request, 'article_module/includes/article_comments_partial.html', context)

@@ -1,11 +1,25 @@
+function getCsrfToken() {
+    const metaToken = document.querySelector('meta[name="csrf-token"]');
+    if (metaToken && metaToken.content) {
+        return metaToken.content;
+    }
+
+    const match = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+}
+
 function sendArticleComment(articleId) {
     var comment = $('#commentText').val();
     var parentId = $('#parent_id').val();
-    console.log(parentId);
-    $.get('/articles/add-article-comment', {
+    $.ajax({
+        url: '/articles/add-article-comment',
+        method: 'POST',
+        headers: {'X-CSRFToken': getCsrfToken()},
+        data: {
         article_comment: comment,
         article_id: articleId,
         parent_id: parentId
+        }
     }).then(res => {
         $('#comments_area').html(res);
         $('#commentText').val('');
@@ -50,7 +64,15 @@ function addProductToOrder(productId, count = null) {
         productCount = $('#product-count').val() || 1;
     }
     
-    $.get('/order/add-to-cart/?product_id=' + productId + '&count=' + productCount).then(res => {
+    $.ajax({
+        url: '/order/add-to-cart/',
+        method: 'POST',
+        headers: {'X-CSRFToken': getCsrfToken()},
+        data: {
+            product_id: productId,
+            count: productCount
+        }
+    }).then(res => {
         Swal.fire({
             title: 'اعلان',
             text: res.text,
@@ -74,7 +96,14 @@ function addProductToOrder(productId, count = null) {
 }
 
 function removeOrderDetail(detailId) {
-    $.get('/user/remove-order-detail?detail_id=' + detailId).then(res => {
+    $.ajax({
+        url: '/user/remove-order-detail',
+        method: 'POST',
+        headers: {'X-CSRFToken': getCsrfToken()},
+        data: {
+            detail_id: detailId
+        }
+    }).then(res => {
         if (res.status === 'success') {
             $('#order-detail-content').html(res.body);
         }
@@ -85,7 +114,15 @@ function removeOrderDetail(detailId) {
 // detail id => order detail id
 // state => increase , decrease
 function changeOrderDetailCount(detailId, state) {
-    $.get('/user/change-order-detail?detail_id=' + detailId + '&state=' + state).then(res => {
+    $.ajax({
+        url: '/user/change-order-detail',
+        method: 'POST',
+        headers: {'X-CSRFToken': getCsrfToken()},
+        data: {
+            detail_id: detailId,
+            state: state
+        }
+    }).then(res => {
         if (res.status === 'success') {
             $('#order-detail-content').html(res.body);
         }

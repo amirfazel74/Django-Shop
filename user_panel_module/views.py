@@ -1,17 +1,18 @@
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
-from django.urls import reverse
 from django.views import View
 from django.views.generic import TemplateView
+from django.views.decorators.http import require_POST
 from account_module.models import User
 from order_module.models import Order, OrderDetail
 from .forms import EditProfileModelForm, ChangePasswordForm
 from django.contrib.auth import logout
 
 
-class UserPanelDashboardPage(TemplateView):
+class UserPanelDashboardPage(LoginRequiredMixin, TemplateView):
     template_name = 'user_panel_module/user_panel_dashboard_page.html'
 
     def get_context_data(self, **kwargs):
@@ -34,7 +35,7 @@ class UserPanelDashboardPage(TemplateView):
         return context
 
 
-class UserPanelOrdersPage(TemplateView):
+class UserPanelOrdersPage(LoginRequiredMixin, TemplateView):
     template_name = 'user_panel_module/user_orders_page.html'
 
     def get_context_data(self, **kwargs):
@@ -51,7 +52,7 @@ class UserPanelOrdersPage(TemplateView):
         return context
 
 
-class EditUserProfilePage(View):
+class EditUserProfilePage(LoginRequiredMixin, View):
     def get(self, request: HttpRequest):
         current_user = User.objects.filter(id=request.user.id).first()
         edit_form = EditProfileModelForm(instance=current_user)
@@ -74,7 +75,7 @@ class EditUserProfilePage(View):
         return render(request, 'user_panel_module/edit_profile_page.html', context)
 
 
-class ChangePasswordPage(View):
+class ChangePasswordPage(LoginRequiredMixin, View):
     def get(self, request: HttpRequest):
         context = {
             'form': ChangePasswordForm()
@@ -89,7 +90,7 @@ class ChangePasswordPage(View):
                 current_user.set_password(form.cleaned_data.get('password'))
                 current_user.save()
                 logout(request)
-                return redirect(reverse('login_page'))
+                return redirect('/auth/')
             else:
                 form.add_error('password', 'کلمه عبور وارد شده اشتباه می باشد')
 
@@ -115,8 +116,10 @@ def user_basket(request: HttpRequest):
     return render(request, 'user_panel_module/user_basket.html', context)
 
 
+@login_required
+@require_POST
 def remove_order_detail(request):
-    detail_id = request.GET.get('detail_id')
+    detail_id = request.POST.get('detail_id')
     if detail_id is None:
         return JsonResponse({
             'status': 'not_found_detail_id'
@@ -142,9 +145,11 @@ def remove_order_detail(request):
     })
 
 
+@login_required
+@require_POST
 def change_order_detail_count(request: HttpRequest):
-    detail_id = request.GET.get('detail_id')
-    state = request.GET.get('state')
+    detail_id = request.POST.get('detail_id')
+    state = request.POST.get('state')
     if detail_id is None or state is None:
         return JsonResponse({
             'status': 'not_found_detail_or_state'

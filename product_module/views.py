@@ -1,6 +1,6 @@
 from django.db.models import Count
 from django.http import HttpRequest
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 from site_module.models import SiteBanner
@@ -32,8 +32,18 @@ class ProductListView(ListView):
         context['categories'] = ProductCategory.objects.filter(is_active=True, is_delete=False)
 
         # ارسال لیست انتخاب‌های کاربر به فرانت‌اند (برای اینکه چک‌باکس‌ها تیک‌خورده باقی بمانند)
-        context['selected_categories'] = self.request.GET.getlist('category')
-        context['selected_brands'] = self.request.GET.getlist('brand')
+        selected_categories = self.request.GET.getlist('category')
+        cat_url = self.kwargs.get('cat')
+        if cat_url and cat_url not in selected_categories:
+            selected_categories.append(cat_url)
+        context['selected_categories'] = selected_categories
+
+        selected_brands = self.request.GET.getlist('brand')
+        brand_url = self.kwargs.get('brand')
+        if brand_url and brand_url not in selected_brands:
+            selected_brands.append(brand_url)
+        context['selected_brands'] = selected_brands
+
         context['selected_hazards'] = self.request.GET.getlist('hazard')
 
         # بنرها
@@ -205,8 +215,8 @@ class ProductDetailView(DetailView):
 # ====================================================================
 class AddProductFavorite(View):
     def post(self, request):
-        product_id = request.POST["product_id"]
-        product = Product.objects.get(pk=product_id)
+        product_id = request.POST.get("product_id")
+        product = get_object_or_404(Product, pk=product_id, is_active=True, is_delete=False)
         request.session["product_favorites"] = product_id
         return redirect(product.get_absolute_url())
 

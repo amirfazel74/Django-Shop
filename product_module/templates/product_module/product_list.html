@@ -65,9 +65,11 @@
                         <div x-show="open" x-collapse>
                             {% for cat in categories %}
                                 <label class="custom-checkbox-row">
-                                    <input type="checkbox" name="category" value="{{ cat.url_title }}"
-                                           style="display: none;" @change="submitForm"
-                                           {% if cat.url_title in selected_categories %}checked{% endif %}>
+                                    {% with cat_id=cat.id|stringformat:"i" %}
+                                        <input type="checkbox" name="category" value="{{ cat.url_title }}"
+                                               style="display: none;" @change="submitForm"
+                                               {% if cat.url_title in selected_categories or cat_id in selected_categories %}checked{% endif %}>
+                                    {% endwith %}
                                     <div class="custom-checkbox"></div>
                                     <span style="font-size: 13px; color: var(--text-dark); font-weight: 500;">{{ cat.title }}</span>
                                 </label>
@@ -86,9 +88,11 @@
                             <div class="hide-scrollbar" style="max-height: 180px; overflow-y: auto;">
                                 {% for brand in brands %}
                                     <label class="custom-checkbox-row">
-                                        <input type="checkbox" name="brand" value="{{ brand.url_title }}"
-                                               style="display: none;" @change="submitForm"
-                                               {% if brand.url_title in selected_brands %}checked{% endif %}>
+                                        {% with brand_id=brand.id|stringformat:"i" %}
+                                            <input type="checkbox" name="brand" value="{{ brand.url_title }}"
+                                                   style="display: none;" @change="submitForm"
+                                                   {% if brand.url_title in selected_brands or brand_id in selected_brands %}checked{% endif %}>
+                                        {% endwith %}
                                         <div class="custom-checkbox"></div>
                                         <span style="font-size: 13px; color: var(--text-dark); font-weight: 500;">{{ brand.title }}</span>
                                         <span style="font-size: 11px; color: var(--text-muted); margin-right: auto; background: var(--bg-site); padding: 2px 6px; border-radius: 4px;">{{ brand.products_count }}</span>

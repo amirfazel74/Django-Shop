@@ -32,6 +32,37 @@ class Slider(models.Model):
         return self.title
 
 
-from django.db import models
+class HomePageSection(models.Model):
+    class SectionType(models.TextChoices):
+        CATEGORIES = 'categories', 'دسته بندی های صفحه اصلی'
+        LATEST_PRODUCTS = 'latest_products', 'محصولات جدید'
+        PROMO_BANNER = 'promo_banner', 'بنر تبلیغاتی میانی'
+        LATEST_ARTICLES = 'latest_articles', 'مقالات جدید'
+
+    section_type = models.CharField(
+        max_length=50,
+        choices=SectionType.choices,
+        unique=True,
+        verbose_name='بخش صفحه اصلی'
+    )
+    title = models.CharField(max_length=250, verbose_name='عنوان')
+    subtitle = models.CharField(max_length=500, blank=True, verbose_name='زیرعنوان')
+    content = models.TextField(blank=True, verbose_name='متن توضیحی')
+    link_text = models.CharField(max_length=100, blank=True, verbose_name='متن لینک یا دکمه')
+    link_url = models.CharField(max_length=500, blank=True, verbose_name='آدرس لینک')
+    image = models.ImageField(upload_to='home-sections/', blank=True, null=True, verbose_name='تصویر بخش')
+    background_color = models.CharField(max_length=20, default='#10b981', verbose_name='رنگ پس زمینه')
+    text_color = models.CharField(max_length=20, default='#ffffff', verbose_name='رنگ متن')
+    item_limit = models.PositiveSmallIntegerField(default=8, verbose_name='تعداد آیتم قابل نمایش')
+    order = models.PositiveSmallIntegerField(default=0, verbose_name='ترتیب نمایش')
+    is_active = models.BooleanField(default=True, verbose_name='فعال باشد؟')
+
+    class Meta:
+        verbose_name = 'بخش صفحه اصلی'
+        verbose_name_plural = 'بخش های صفحه اصلی'
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return self.get_section_type_display()
 
 # Create your models here.
